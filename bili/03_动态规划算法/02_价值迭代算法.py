@@ -81,10 +81,9 @@ def get_values():
             # 遍历所有动作
             for action in range(4):
                 action_value[action] = get_qsa(row, col, action)
-            # 每个动作的分数和它的概率相乘
-            action_value *= pi[row, col]
-            # 最后这个格子的分数,等于该格子下所有动作的分数求和
-            new_values[row, col] = action_value.sum()
+            """和策略迭代算法唯一的不同点"""
+            # 求每一个格子的分数，等于该格子下所有动作的最大分数
+            new_values[row, col] = max(action_value)
     return new_values
 
 
