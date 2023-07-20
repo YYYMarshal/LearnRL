@@ -25,15 +25,17 @@ class MyWrapper(gym.Wrapper):
         return state, reward, done, info
 
 
-env = MyWrapper()
-
-env.reset()
-
-
 # 打印游戏
-def show():
+def show(env):
     plt.imshow(env.render())
     plt.show()
 
 
-show()
+def main():
+    env = MyWrapper()
+    env.reset()
+    show(env)
+
+
+if __name__ == '__main__':
+    main()
