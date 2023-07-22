@@ -1,7 +1,6 @@
 """
 递减的贪婪算法，探索的欲望逐渐降低
 """
-
 import numpy as np
 import random
 
@@ -37,7 +36,6 @@ def try_and_play():
     reward = 0
     if random.random() < probs[i]:
         reward = 1
-
     # 记录玩的结果
     rewards[i].append(reward)
 

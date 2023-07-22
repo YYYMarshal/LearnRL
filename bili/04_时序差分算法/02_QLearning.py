@@ -1,6 +1,5 @@
 """
 时序差分算法：无模型，在线学习
-Sarsa算法：根据S,A,R,S,A计算更新量
 """
 import numpy as np
 import random

@@ -19,10 +19,8 @@ def choose_one():
     if random.random() < 0.01:
         # 左右都闭，均可取到
         return random.randint(0, 9)
-
     # 计算每个老虎机的奖励平均，rewards 是一个二维列表，所以 i = rewards[index] 是一个列表
     rewards_mean = [np.mean(i) for i in rewards]
-
     # 选择期望奖励估值最大的拉杆
     # np.argmax()是numpy中获取array的某一个维度中数值最大的那个元素的索引
     return np.argmax(rewards_mean)
@@ -30,7 +28,6 @@ def choose_one():
 
 def try_and_play():
     i = choose_one()
-
     # 玩老虎机,得到结果
     reward = 0
     if random.random() < probs[i]:
