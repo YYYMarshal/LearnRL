@@ -3,73 +3,115 @@ import torch
 import random
 from IPython import display
 from matplotlib import pyplot as plt
+import numpy as np
 
-env = gym.make("CartPole-v1", render_mode="human")
+
+# 定义环境
+class MyWrapper(gym.Wrapper):
+    def __init__(self):
+        # env = gym.make('CartPole-v1', render_mode='rgb_array')
+        env = gym.make('CartPole-v1', render_mode='human')
+        super().__init__(env)
+        self.env = env
+        self.step_n = 0
+
+    def reset(self):
+        state, _ = self.env.reset()
+        self.step_n = 0
+        return state
+
+    def step(self, action):
+        state, reward, terminated, truncated, info = self.env.step(action)
+        done = terminated or truncated
+        self.step_n += 1
+        if self.step_n >= 200:
+            done = True
+        return state, reward, done, info
 
 
-def test_env():
+# 打印游戏
+def show(env):
+    plt.imshow(env.render())
+    plt.show()
+
+
+# 测试游戏环境
+def test_env(env):
     state = env.reset()
-    print(f"state = {state}")
-    print(f"env.action_space = {env.action_space}")
+    print('这个游戏的状态用4个数字表示,我也不知道这4个数字分别是什么意思,反正这4个数字就能描述游戏全部的状态')
+    print('state=', state)
+    # state= [ 0.03490619  0.04873464  0.04908862 -0.00375859]
+    print('这个游戏一共有2个动作,不是0就是1')
+    print('env.action_space=', env.action_space)
+    # env.action_space= Discrete(2)
+    print('随机一个动作')
     action = env.action_space.sample()
-    print(f"随机一个动作：{action}")
-    observation, reward, terminated, truncated, info = env.step(action)
-    print(f"observation = {observation}")
-    over = terminated or truncated
-    print(f"reward = {reward}, over = {over}")
-    # 游戏结束了就重置
-    if over:
-        env.reset()
+    print('action=', action)
+    # action= 1
+    print('执行一个动作,得到下一个状态,奖励,是否结束')
+    state, reward, over, info = env.step(action)
+    print('state=', state)
+    # state= [ 0.02018229 -0.16441101  0.01547085  0.2661691 ]
+    print('reward=', reward)
+    # reward= 1.0
+    print('over=', over)
+    # over= False
 
 
 def create_model():
-    result_model = torch.nn.Sequential(
+    model = torch.nn.Sequential(
         torch.nn.Linear(4, 128),
         torch.nn.ReLU(),
         torch.nn.Linear(128, 2),
     )
-    return result_model
+    return model
 
 
-# 计算动作的模型，也是真正要用的模型
-model = create_model()
-# 经验网络，用于评估一个状态的分数
-next_model = create_model()
-# 样本池
-datas = []
-
-
-def get_action(state):
+# 得到一个动作
+def get_action(state, model):
     if random.random() < 0.01:
         return random.choice([0, 1])
-    # 走神经网络，得到一个动作
+
+    # 走神经网络,得到一个动作
     state = torch.FloatTensor(state).reshape(1, 4)
     return model(state).argmax().item()
 
 
+# 样本池
+datas = []
+
+
 # 向样本池中添加N条数据,删除M条最古老的数据
-def update_data():
+def update_data(env, model):
     old_count = len(datas)
+
     # 玩到新增了N个数据为止
     while len(datas) - old_count < 200:
         # 初始化游戏
         state = env.reset()
+
         # 玩到游戏结束为止
         over = False
         while not over:
             # 根据当前状态得到一个动作
-            action = get_action(state)
+            action = get_action(state, model)
+
             # 执行动作,得到反馈
-            next_state, reward, over, truncated, info = env.step(action)
+            next_state, reward, over, _ = env.step(action)
+
             # 记录数据样本
             datas.append((state, action, reward, next_state, over))
+
             # 更新游戏状态,开始下一个动作
             state = next_state
+
     update_count = len(datas) - old_count
     drop_count = max(len(datas) - 10000, 0)
+
     # 数据上限,超出时从最古老的开始删除
     while len(datas) > 10000:
         datas.pop(0)
+
     return update_count, drop_count
 
 
@@ -79,20 +121,22 @@ def get_sample():
     samples = random.sample(datas, 64)
 
     # [b, 4]
-    state = torch.FloatTensor([i[0] for i in samples]).reshape(-1, 4)
+    # state = torch.FloatTensor([i[0] for i in samples]).reshape(-1, 4)
+    samples_np = np.array([i[0] for i in samples])
+    state = torch.FloatTensor(samples_np).reshape(-1, 4)
     # [b, 1]
-    action = torch.LongTensor([i[1] for i in samples]).reshape(-1, 1)
+    action = torch.LongTensor(np.array([i[1] for i in samples])).reshape(-1, 1)
     # [b, 1]
-    reward = torch.FloatTensor([i[2] for i in samples]).reshape(-1, 1)
+    reward = torch.FloatTensor(np.array([i[2] for i in samples])).reshape(-1, 1)
     # [b, 4]
-    next_state = torch.FloatTensor([i[3] for i in samples]).reshape(-1, 4)
+    next_state = torch.FloatTensor(np.array([i[3] for i in samples])).reshape(-1, 4)
     # [b, 1]
     over = torch.LongTensor([i[4] for i in samples]).reshape(-1, 1)
 
     return state, action, reward, next_state, over
 
 
-def get_value(state, action):
+def get_value(state, action, model):
     # 使用状态计算出动作的 logic
     # [b, 4] -> [b, 2]
     value = model(state)
@@ -107,7 +151,7 @@ def get_value(state, action):
     return value
 
 
-def get_target(reward, next_state, over):
+def get_target(reward, next_state, over, next_model):
     # 上面已经把模型认为的状态下执行动作的分数给评估出来了
     # 下面使用next_state和reward计算真实的分数
     # 针对一个状态,它到底应该多少分,可以使用以往模型积累的经验评估
@@ -138,13 +182,7 @@ def get_target(reward, next_state, over):
     return target
 
 
-# 打印游戏
-def show():
-    plt.imshow(env.render())
-    plt.show()
-
-
-def test(play):
+def test(play, env, model):
     # 初始化游戏
     state = env.reset()
 
@@ -155,21 +193,21 @@ def test(play):
     over = False
     while not over:
         # 根据当前状态得到一个动作
-        action = get_action(state)
+        action = get_action(state, model)
 
         # 执行动作,得到反馈
-        state, reward, over, truncated, info = env.step(action)
+        state, reward, over, _ = env.step(action)
         reward_sum += reward
 
         # 打印动画
         if play and random.random() < 0.2:  # 跳帧
             display.clear_output(wait=True)
-            show()
+            show(env)
 
     return reward_sum
 
 
-def train():
+def train(env, model, next_model):
     model.train()
     optimizer = torch.optim.Adam(model.parameters(), lr=2e-3)
     loss_fn = torch.nn.MSELoss()
@@ -177,7 +215,7 @@ def train():
     # 训练N次
     for epoch in range(500):
         # 更新N条数据
-        update_count, drop_count = update_data()
+        update_count, drop_count = update_data(env, model)
 
         # 每次更新过数据后,学习N次
         for i in range(200):
@@ -185,8 +223,8 @@ def train():
             state, action, reward, next_state, over = get_sample()
 
             # 计算一批样本的value和target
-            value = get_value(state, action)
-            target = get_target(reward, next_state, over)
+            value = get_value(state, action, model)
+            target = get_target(reward, next_state, over, next_model)
 
             # 更新参数
             loss = loss_fn(value, target)
@@ -199,20 +237,35 @@ def train():
                 next_model.load_state_dict(model.state_dict())
 
         if epoch % 50 == 0:
-            test_result = sum([test(play=False) for _ in range(20)]) / 20
-            print(epoch, len(datas), update_count, drop_count, test_result)
+            test_result = sum([test(False, env, next_model) for _ in range(20)]) / 20
+            print(f"epoch = {epoch}, len(datas) = {len(datas)}, "
+                  f"update_count = {update_count}, drop_count = {drop_count}, "
+                  f"test_result = {test_result}")
 
 
 def main():
-    test_env()
-
-    # 把 model 的参数复制给 next_model
+    env = MyWrapper()
+    env.reset()
+    test_env(env)
+    # 计算动作的模型,也是真正要用的模型
+    model = create_model()
+    # 经验网络,用于评估一个状态的分数
+    next_model = create_model()
+    # 把model的参数复制给next_model
     next_model.load_state_dict(model.state_dict())
     print(model)
     print(next_model)
-    # state, action, reward, next_state, over = get_sample()
-    test(False)
-    train()
+    result_get_action = get_action([0.0013847, -0.01194451, 0.04260966, 0.00688801], model)
+    print(f"result_get_action = {result_get_action}")
+    update_count, drop_count = update_data(env, model)
+    print(f"update_count = {update_count}, drop_count = {drop_count}, "
+          f"len(datas) = {len(datas)}")
+    state, action, reward, next_state, over = get_sample()
+    # print(f"{0}， {1}， {2}， {3}", state, action, reward, next_state, over)
+    print("get_value() = ", get_value(state, action, model).shape)
+    print("get_target() = ", get_target(reward, next_state, over, next_model).shape)
+    print("test() = ", test(False, env, model))
+    train(env, model, next_model)
 
 
 if __name__ == '__main__':
