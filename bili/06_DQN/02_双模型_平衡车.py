@@ -205,6 +205,7 @@ def main():
     env = MyWrapper()
     env.reset()
     env_info(env)
+    return
     # 计算动作的模型,也是真正要用的模型
     model = create_model()
     # 经验网络,用于评估一个状态的分数
