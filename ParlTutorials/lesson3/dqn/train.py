@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # 检查paddle和parl的版本
 import gym
 import parl
 import paddle
+
 assert paddle.__version__ == "1.8.5", "[Version WARNING] please try `pip install paddlepaddle==1.8.5`"
 assert parl.__version__ == "1.3.1" or parl.__version__ == "1.4", "[Version WARNING] please try `pip install parl==1.3.1` or `pip install parl==1.4` "
 assert gym.__version__ == "0.18.0", "[Version WARNING] please try `pip install gym==0.18.0`"
@@ -87,9 +88,9 @@ def evaluate(env, agent, render=False):
 
 
 def main():
-    env = gym.make(
-        'CartPole-v0'
-    )  # CartPole-v0: expected reward > 180                MountainCar-v0 : expected reward > -120
+    # CartPole-v0: expected reward > 180
+    # MountainCar-v0 : expected reward > -120
+    env = gym.make('CartPole-v0')
     action_dim = env.action_space.n  # CartPole-v0: 2
     obs_shape = env.observation_space.shape  # CartPole-v0: (4,)
 

@@ -25,15 +25,14 @@ assert gym.__version__ == "0.18.0", "[Version WARNING] please try `pip install g
 def run_episode(env, agent: SarsaAgent, render=False):
     total_steps = 0  # 记录每个episode走了多少step
     total_reward = 0
-
     obs = env.reset()  # 重置环境, 重新开一局（即开始新的一个episode）
     action = agent.sample(obs)  # 根据算法选择一个动作
-
     while True:
         next_obs, reward, done, _ = env.step(action)  # 与环境进行一个交互
         next_action = agent.sample(next_obs)  # 根据算法选择一个动作
         # 训练 Sarsa 算法
         agent.learn(obs, action, reward, next_obs, next_action, done)
+
         obs = next_obs  # 存储上一个观察值
         action = next_action
         total_reward += reward

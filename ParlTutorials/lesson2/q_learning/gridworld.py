@@ -18,24 +18,29 @@ import gym
 import turtle
 import numpy as np
 
+
 # turtle tutorial : https://docs.python.org/3.3/library/turtle.html
 
 
-def GridWorld(gridmap=None, is_slippery=False):
+def grid_world(gridmap=None):
     if gridmap is None:
-        gridmap = ['SFFF', 'FHFH', 'FFFH', 'HFFG']
+        gridmap = ['SFFF',
+                   'FHFH',
+                   'FFFH',
+                   'HFFG']
     env = gym.make("FrozenLake-v0", desc=gridmap, is_slippery=False)
-    env = FrozenLakeWapper(env)
+    env = FrozenLakeWrapper(env)
     return env
 
 
-class FrozenLakeWapper(gym.Wrapper):
+class FrozenLakeWrapper(gym.Wrapper):
     def __init__(self, env):
         gym.Wrapper.__init__(self, env)
         self.max_y = env.desc.shape[0]
         self.max_x = env.desc.shape[1]
         self.t = None
         self.unit = 50
+        self.wn = None
 
     def draw_box(self, x, y, fillcolor='', line_color='gray'):
         self.t.up()
@@ -56,8 +61,8 @@ class FrozenLakeWapper(gym.Wrapper):
         self.t.fillcolor('red')
         self.t.goto((x + 0.5) * self.unit, (y + 0.5) * self.unit)
 
-    def render(self):
-        if self.t == None:
+    def render(self, mode='human', **kwargs):
+        if self.t is None:
             self.t = turtle.Turtle()
             self.wn = turtle.Screen()
             self.wn.setup(self.unit * self.max_x + 100,
@@ -89,13 +94,14 @@ class FrozenLakeWapper(gym.Wrapper):
         self.move_player(x_pos, y_pos)
 
 
-class CliffWalkingWapper(gym.Wrapper):
+class CliffWalkingWrapper(gym.Wrapper):
     def __init__(self, env):
         gym.Wrapper.__init__(self, env)
         self.t = None
         self.unit = 50
         self.max_x = 12
         self.max_y = 4
+        self.wn = None
 
     def draw_x_line(self, y, x0, x1, color='gray'):
         assert x1 > x0
@@ -134,8 +140,8 @@ class CliffWalkingWapper(gym.Wrapper):
         self.t.fillcolor('red')
         self.t.goto((x + 0.5) * self.unit, (y + 0.5) * self.unit)
 
-    def render(self):
-        if self.t == None:
+    def render(self, mode='human', **kwargs):
+        if self.t is None:
             self.t = turtle.Turtle()
             self.wn = turtle.Screen()
             self.wn.setup(self.unit * self.max_x + 100,
@@ -168,15 +174,15 @@ class CliffWalkingWapper(gym.Wrapper):
         self.move_player(x_pos, y_pos)
 
 
-if __name__ == '__main__':
+def main():
     # 环境1：FrozenLake, 可以配置冰面是否是滑的
     # 0 left, 1 down, 2 right, 3 up
     env = gym.make("FrozenLake-v0", is_slippery=False)
-    env = FrozenLakeWapper(env)
+    env = FrozenLakeWrapper(env)
 
     # 环境2：CliffWalking, 悬崖环境
     # env = gym.make("CliffWalking-v0")  # 0 up, 1 right, 2 down, 3 left
-    # env = CliffWalkingWapper(env)
+    # env = CliffWalkingWrapper(env)
 
     # 环境3：自定义格子世界，可以配置地图, S为出发点Start, F为平地Floor, H为洞Hole, G为出口目标Goal
     # gridmap = [
@@ -190,6 +196,9 @@ if __name__ == '__main__':
     for step in range(10):
         action = np.random.randint(0, 4)
         obs, reward, done, info = env.step(action)
-        print('step {}: action {}, obs {}, reward {}, done {}, info {}'.format(\
-                step, action, obs, reward, done, info))
+        print('step {}: action {}, obs {}, reward {}, done {}, info {}'.format(step, action, obs, reward, done, info))
         # env.render() # 渲染一帧图像
+
+
+if __name__ == '__main__':
+    main()

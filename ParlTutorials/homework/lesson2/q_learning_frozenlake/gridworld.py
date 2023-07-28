@@ -18,6 +18,7 @@ import gym
 import turtle
 import numpy as np
 
+
 # turtle tutorial : https://docs.python.org/3.3/library/turtle.html
 
 
@@ -190,6 +191,6 @@ if __name__ == '__main__':
     for step in range(10):
         action = np.random.randint(0, 4)
         obs, reward, done, info = env.step(action)
-        print('step {}: action {}, obs {}, reward {}, done {}, info {}'.format(\
-                step, action, obs, reward, done, info))
+        print('step {}: action {}, obs {}, reward {}, done {}, info {}'.format( \
+            step, action, obs, reward, done, info))
         # env.render() # 渲染一帧图像

@@ -18,12 +18,7 @@ import numpy as np
 
 
 class SarsaAgent(object):
-    def __init__(self,
-                 obs_n,
-                 act_n,
-                 learning_rate=0.01,
-                 gamma=0.9,
-                 e_greed=0.1):
+    def __init__(self, obs_n, act_n, learning_rate=0.01, gamma=0.9, e_greed=0.1):
         self.act_n = act_n  # 动作维度，有几个动作可选
         self.lr = learning_rate  # 学习率
         self.gamma = gamma  # reward的衰减率
@@ -32,17 +27,17 @@ class SarsaAgent(object):
 
     # 根据输入观察值，采样输出的动作值，带探索
     def sample(self, obs):
-        if np.random.uniform(0, 1) < (1.0 - self.epsilon):  #根据table的Q值选动作
+        if np.random.uniform(0, 1) < (1.0 - self.epsilon):  # 根据table的Q值选动作
             action = self.predict(obs)
         else:
-            action = np.random.choice(self.act_n)  #有一定概率随机探索选取一个动作
+            action = np.random.choice(self.act_n)  # 有一定概率随机探索选取一个动作
         return action
 
     # 根据输入观察值，预测输出的动作值
     def predict(self, obs):
-        Q_list = self.Q[obs, :]
-        maxQ = np.max(Q_list)
-        action_list = np.where(Q_list == maxQ)[0]  # maxQ可能对应多个action
+        q_list = self.Q[obs, :]
+        max_q = np.max(q_list)
+        action_list = np.where(q_list == max_q)[0]  # maxQ可能对应多个action
         action = np.random.choice(action_list)
         return action
 
@@ -56,13 +51,12 @@ class SarsaAgent(object):
             next_action: 根据当前Q表格, 针对next_obs会选择的动作, a_t+1
             done: episode是否结束
         """
-        predict_Q = self.Q[obs, action]
+        predict_q = self.Q[obs, action]
         if done:
-            target_Q = reward  # 没有下一个状态了
+            target_q = reward  # 没有下一个状态了
         else:
-            target_Q = reward + self.gamma * self.Q[next_obs,
-                                                    next_action]  # Sarsa
-        self.Q[obs, action] += self.lr * (target_Q - predict_Q)  # 修正q
+            target_q = reward + self.gamma * self.Q[next_obs, next_action]  # Sarsa
+        self.Q[obs, action] += self.lr * (target_q - predict_q)  # 修正q
 
     def save(self):
         npy_file = './q_table.npy'

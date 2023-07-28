@@ -25,8 +25,16 @@ assert gym.__version__ == "0.18.0", "[Version WARNING] please try `pip install g
 
 
 def grid_world(gridmap=None):
+    """
+    自定义格子世界，可以配置地图，S为出发点Start，F为平地Floor，H为洞Hole，G为出口目标Goal
+    :param gridmap:
+    :return:
+    """
     if gridmap is None:
-        gridmap = ['SFFF', 'FHFH', 'FFFH', 'HFFG']
+        gridmap = ['SFFF',
+                   'FHFH',
+                   'FFFH',
+                   'HFFG']
     env = gym.make("FrozenLake-v0", desc=gridmap, is_slippery=False)
     env = FrozenLakeWrapper(env)
     return env
