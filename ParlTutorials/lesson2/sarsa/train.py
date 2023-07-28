@@ -34,9 +34,8 @@ def run_episode(env, agent: SarsaAgent, render=False):
         next_action = agent.sample(next_obs)  # 根据算法选择一个动作
         # 训练 Sarsa 算法
         agent.learn(obs, action, reward, next_obs, next_action, done)
-
-        action = next_action
         obs = next_obs  # 存储上一个观察值
+        action = next_action
         total_reward += reward
         total_steps += 1  # 计算step数
         if render:
@@ -71,12 +70,8 @@ def main():
         env = gym.make("CliffWalking-v0")  # 0 up, 1 right, 2 down, 3 left
         env = CliffWalkingWrapper(env)
 
-    agent = SarsaAgent(
-        obs_n=env.observation_space.n,
-        act_n=env.action_space.n,
-        learning_rate=0.1,
-        gamma=0.9,
-        e_greed=0.1)
+    agent = SarsaAgent(obs_n=env.observation_space.n,
+                       act_n=env.action_space.n, learning_rate=0.1, gamma=0.9, e_greed=0.1)
 
     is_render = False
     for episode in range(500):
