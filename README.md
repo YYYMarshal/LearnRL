@@ -5,6 +5,7 @@ EasyRL
 ```cmd
 # python: 3.7
 conda create -n envrl python=3.7
+conda activate envrl
 # PyTorch v1.12.1
 pip install torch==1.10.0+cu113 torchvision==0.11.0+cu113 torchaudio==0.10.0 --extra-index-url https://download.pytorch.org/whl/cu113
 # gym
@@ -18,6 +19,7 @@ bili
 ```cmd
 # python: 3.9
 conda create -n rlbili python=3.9
+conda activate rlbili
 # PyTorch v1.12.1
 pip install torch==1.10.0+cu113 torchvision==0.11.0+cu113 torchaudio==0.10.0 --extra-index-url https://download.pytorch.org/whl/cu113
 # gym 0.26.2
