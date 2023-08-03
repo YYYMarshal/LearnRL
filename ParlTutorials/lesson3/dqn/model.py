@@ -12,14 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import parl
 from parl import layers  # 封装了 paddle.fluid.layers 的API
 
 
 class Model(parl.Model):
+    def parameters(self):
+        pass
+
+    def forward(self, *args, **kwargs):
+        pass
+
     def __init__(self, act_dim):
+        super().__init__()
         hid1_size = 128
         hid2_size = 128
         # 3层全连接网络
@@ -30,5 +37,5 @@ class Model(parl.Model):
     def value(self, obs):
         h1 = self.fc1(obs)
         h2 = self.fc2(h1)
-        Q = self.fc3(h2)
-        return Q
+        q = self.fc3(h2)
+        return q

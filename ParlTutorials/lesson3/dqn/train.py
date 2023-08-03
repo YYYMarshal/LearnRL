@@ -14,26 +14,21 @@
 
 # -*- coding: utf-8 -*-
 
-# 检查paddle和parl的版本
 import gym
 import parl
 import paddle
-
-assert paddle.__version__ == "1.8.5", "[Version WARNING] please try `pip install paddlepaddle==1.8.5`"
-assert parl.__version__ == "1.3.1" or parl.__version__ == "1.4", "[Version WARNING] please try `pip install parl==1.3.1` or `pip install parl==1.4` "
-assert gym.__version__ == "0.18.0", "[Version WARNING] please try `pip install gym==0.18.0`"
-
-import os
-import gym
 import numpy as np
-import parl
 from parl.utils import logger  # 日志打印工具
-
 from model import Model
 from algorithm import DQN  # from parl.algorithms import DQN  # parl >= 1.3.1
 from agent import Agent
-
 from replay_memory import ReplayMemory
+
+# 检查paddle和parl的版本
+assert paddle.__version__ == "1.8.5", "[Version WARNING] please try `pip install paddlepaddle==1.8.5`"
+assert parl.__version__ == "1.3.1" or parl.__version__ == "1.4", \
+    "[Version WARNING] please try `pip install parl==1.3.1` or `pip install parl==1.4` "
+assert gym.__version__ == "0.18.0", "[Version WARNING] please try `pip install gym==0.18.0`"
 
 LEARN_FREQ = 5  # 训练频率，不需要每一个step都learn，攒一些新增经验后再learn，提高效率
 MEMORY_SIZE = 20000  # replay memory的大小，越大越占用内存
@@ -59,8 +54,8 @@ def run_episode(env, agent, rpm):
             (batch_obs, batch_action, batch_reward, batch_next_obs,
              batch_done) = rpm.sample(BATCH_SIZE)
             train_loss = agent.learn(batch_obs, batch_action, batch_reward,
-                                     batch_next_obs,
-                                     batch_done)  # s,a,r,s',done
+                                     batch_next_obs, batch_done)  # s,a,r,s',done
+            print(f"train_loss = {train_loss}")
 
         total_reward += reward
         obs = next_obs
@@ -122,6 +117,7 @@ def main():
         # train part
         for i in range(0, 50):
             total_reward = run_episode(env, agent, rpm)
+            print(f"total_reward = {total_reward}")
             episode += 1
 
         # test part

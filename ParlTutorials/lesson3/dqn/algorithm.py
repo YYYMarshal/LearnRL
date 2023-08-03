@@ -21,6 +21,9 @@ from parl import layers
 
 
 class DQN(parl.Algorithm):
+    def sample(self, *args, **kwargs):
+        pass
+
     def __init__(self, model, act_dim=None, gamma=None, lr=None):
         """ DQN algorithm
         
@@ -30,6 +33,7 @@ class DQN(parl.Algorithm):
             gamma (float): reward的衰减因子
             lr (float): learning_rate，学习率.
         """
+        super().__init__(model)
         self.model = model
         self.target_model = copy.deepcopy(model)
 
@@ -48,26 +52,27 @@ class DQN(parl.Algorithm):
     def learn(self, obs, action, reward, next_obs, terminal):
         """ 使用DQN算法更新self.model的value网络
         """
-
         # 从target_model中获取 max Q' 的值，用于计算target_Q
-        next_pred_value = self.target_model.value(next_obs)
-        best_v = layers.reduce_max(next_pred_value, dim=1)
+        next_predict_value = self.target_model.value(next_obs)
+        best_v = layers.reduce_max(next_predict_value, dim=1)
         best_v.stop_gradient = True  # 阻止梯度传递
+        # 下面左侧的 terminal 的值为 0或1
         terminal = layers.cast(terminal, dtype='float32')
-        target = reward + (1.0 - terminal) * self.gamma * best_v
+        # target = reward + (1.0 - terminal) * self.gamma * best_v
+        target = reward + (1.0 - terminal.numpy()) * self.gamma * best_v.numpy()
 
-        pred_value = self.model.value(obs)  # 获取Q预测值
+        predict_value = self.model.value(obs)  # 获取Q预测值
         # 将action转onehot向量，比如：3 => [0,0,0,1,0]
         action_onehot = layers.one_hot(action, self.act_dim)
         action_onehot = layers.cast(action_onehot, dtype='float32')
         # 下面一行是逐元素相乘，拿到action对应的 Q(s,a)
-        # 比如：pred_value = [[2.3, 5.7, 1.2, 3.9, 1.4]], action_onehot = [[0,0,0,1,0]]
-        #  ==> pred_action_value = [[3.9]]
-        pred_action_value = layers.reduce_sum(
-            layers.elementwise_mul(action_onehot, pred_value), dim=1)
+        # 比如：predict_value = [[2.3, 5.7, 1.2, 3.9, 1.4]], action_onehot = [[0,0,0,1,0]]
+        #  ==> predict_action_value = [[3.9]]
+        predict_action_value = layers.reduce_sum(
+            layers.elementwise_mul(action_onehot, predict_value), dim=1)
 
         # 计算 Q(s,a) 与 target_Q的均方差，得到loss
-        cost = layers.square_error_cost(pred_action_value, target)
+        cost = layers.square_error_cost(predict_action_value, target)
         cost = layers.reduce_mean(cost)
         optimizer = fluid.optimizer.Adam(learning_rate=self.lr)  # 使用Adam优化器
         optimizer.minimize(cost)
