@@ -59,7 +59,7 @@ class DQN(parl.Algorithm):
         # 下面左侧的 terminal 的值为 0或1
         terminal = layers.cast(terminal, dtype='float32')
         # target = reward + (1.0 - terminal) * self.gamma * best_v
-        target = reward + (1.0 - terminal.numpy()) * self.gamma * best_v.numpy()
+        target = reward + (1.0 - terminal) * self.gamma * best_v
 
         predict_value = self.model.value(obs)  # 获取Q预测值
         # 将action转onehot向量，比如：3 => [0,0,0,1,0]

@@ -55,7 +55,7 @@ def run_episode(env, agent, rpm):
              batch_done) = rpm.sample(BATCH_SIZE)
             train_loss = agent.learn(batch_obs, batch_action, batch_reward,
                                      batch_next_obs, batch_done)  # s,a,r,s',done
-            print(f"train_loss = {train_loss}")
+            # print(f"train_loss = {train_loss}")
 
         total_reward += reward
         obs = next_obs
@@ -117,7 +117,7 @@ def main():
         # train part
         for i in range(0, 50):
             total_reward = run_episode(env, agent, rpm)
-            print(f"total_reward = {total_reward}")
+            # print(f"total_reward = {total_reward}")
             episode += 1
 
         # test part
