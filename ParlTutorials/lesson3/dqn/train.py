@@ -128,6 +128,7 @@ def main():
     # 训练结束，保存模型
     save_path = './dqn_model.ckpt'
     agent.save(save_path)
+    env.close()
 
 
 if __name__ == '__main__':
