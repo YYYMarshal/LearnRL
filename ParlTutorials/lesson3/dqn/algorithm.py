@@ -16,7 +16,6 @@
 
 import copy
 
-import numpy as np
 import paddle.fluid as fluid
 import parl
 from parl import layers
@@ -60,8 +59,6 @@ class DQN(parl.Algorithm):
         best_v.stop_gradient = True  # 阻止梯度传递
         # 下面左侧的 terminal 的值为 0或1
         terminal = layers.cast(terminal, dtype='float32')
-        terminal = np.array(terminal).astype("float32")
-        best_v = np.array(terminal).astype("float32")
         target = reward + (1.0 - terminal) * self.gamma * best_v
 
         predict_value = self.model.value(obs)  # 获取Q预测值
