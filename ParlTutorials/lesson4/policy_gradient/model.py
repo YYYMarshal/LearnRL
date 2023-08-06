@@ -12,14 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import parl
 from parl import layers
 
 
 class Model(parl.Model):
+    def parameters(self):
+        pass
+
     def __init__(self, act_dim):
+        super().__init__()
         act_dim = act_dim
         hid1_size = act_dim * 10
 

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import numpy as np
 import paddle.fluid as fluid
@@ -22,15 +22,21 @@ from parl import layers
 
 class Agent(parl.Agent):
     def __init__(self, algorithm, obs_dim, act_dim):
+        # self.fluid_executor = fluid.Executor()
+        # self.predict_program = None
+        # self.learn_program = None
+        # self.act_prob = None
+        # self.cost = None
+
         self.obs_dim = obs_dim
         self.act_dim = act_dim
         super(Agent, self).__init__(algorithm)
 
     def build_program(self):
-        self.pred_program = fluid.Program()
+        self.predict_program = fluid.Program()
         self.learn_program = fluid.Program()
 
-        with fluid.program_guard(self.pred_program):  # 搭建计算图用于 预测动作，定义输入输出变量
+        with fluid.program_guard(self.predict_program):  # 搭建计算图用于 预测动作，定义输入输出变量
             obs = layers.data(
                 name='obs', shape=[self.obs_dim], dtype='float32')
             self.act_prob = self.alg.predict(obs)
@@ -46,7 +52,7 @@ class Agent(parl.Agent):
     def sample(self, obs):
         obs = np.expand_dims(obs, axis=0)  # 增加一维维度
         act_prob = self.fluid_executor.run(
-            self.pred_program,
+            self.predict_program,
             feed={'obs': obs.astype('float32')},
             fetch_list=[self.act_prob])[0]
         act_prob = np.squeeze(act_prob, axis=0)  # 减少一维维度
@@ -56,7 +62,7 @@ class Agent(parl.Agent):
     def predict(self, obs):
         obs = np.expand_dims(obs, axis=0)
         act_prob = self.fluid_executor.run(
-            self.pred_program,
+            self.predict_program,
             feed={'obs': obs.astype('float32')},
             fetch_list=[self.act_prob])[0]
         act_prob = np.squeeze(act_prob, axis=0)

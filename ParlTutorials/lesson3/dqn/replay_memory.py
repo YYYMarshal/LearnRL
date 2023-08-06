@@ -28,7 +28,8 @@ class ReplayMemory(object):
 
     def sample(self, batch_size):
         mini_batch = random.sample(self.buffer, batch_size)
-        obs_batch, action_batch, reward_batch, next_obs_batch, done_batch = [], [], [], [], []
+        obs_batch, action_batch, reward_batch, next_obs_batch, done_batch = \
+            [], [], [], [], []
 
         for experience in mini_batch:
             s, a, r, s_p, done = experience

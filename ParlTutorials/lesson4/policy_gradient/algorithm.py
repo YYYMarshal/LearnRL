@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import paddle.fluid as fluid
 import parl
@@ -20,6 +20,9 @@ from parl import layers
 
 
 class PolicyGradient(parl.Algorithm):
+    def sample(self, *args, **kwargs):
+        pass
+
     def __init__(self, model, lr=None):
         """ Policy Gradient algorithm
         
@@ -28,6 +31,7 @@ class PolicyGradient(parl.Algorithm):
             lr (float): 学习率.
         """
 
+        super().__init__(model)
         self.model = model
         assert isinstance(lr, float)
         self.lr = lr
