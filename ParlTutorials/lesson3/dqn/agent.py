@@ -23,6 +23,7 @@ from parl import layers
 class Agent(parl.Agent):
     def __init__(self, algorithm, obs_dim, act_dim, e_greed=0.1, e_greed_decrement=0):
         self.fluid_executor = fluid.Executor()
+        # self.fluid_executor = None
         self.predict_program = None
         self.learn_program = None
         self.value = None
