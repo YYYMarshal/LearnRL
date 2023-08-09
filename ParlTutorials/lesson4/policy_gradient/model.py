@@ -28,6 +28,7 @@ class Model(parl.Model):
         hid1_size = act_dim * 10
 
         self.fc1 = layers.fc(size=hid1_size, act='tanh')
+        # 第二层一定要用 softmax 激活函数，才能输出动作概率
         self.fc2 = layers.fc(size=act_dim, act='softmax')
 
     def forward(self, obs):  # 可直接用 model = Model(5); model(obs)调用

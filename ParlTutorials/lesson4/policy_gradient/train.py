@@ -109,7 +109,8 @@ def main():
             logger.info('Test reward: {}'.format(total_reward))
 
     # save the parameters to ./model.ckpt
-    agent.save('./model.ckpt')
+    # agent.save('./model.ckpt')
+    env.close()
 
 
 if __name__ == '__main__':
