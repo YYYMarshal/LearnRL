@@ -46,10 +46,10 @@ class PolicyGradient(parl.Algorithm):
         """
         act_prob = self.model(obs)  # 获取输出动作概率
         # log_prob = layers.cross_entropy(act_prob, action) # 交叉熵
-        log_prob = layers.reduce_sum(
-            -1.0 * layers.log(act_prob) * layers.one_hot(
-                action, act_prob.shape[1]),
-            dim=1)
+        x = -1.0 * layers.log(act_prob)
+        y = layers.one_hot(action, act_prob.shape[1])
+        param = x * y
+        log_prob = layers.reduce_sum(param, dim=1)
         cost = log_prob * reward
         cost = layers.reduce_mean(cost)
 

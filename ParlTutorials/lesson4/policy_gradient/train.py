@@ -12,26 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # 检查paddle和parl的版本
 import gym
 import parl
 import paddle
-assert paddle.__version__ == "1.8.5", "[Version WARNING] please try `pip install paddlepaddle==1.8.5`"
-assert parl.__version__ == "1.3.1" or parl.__version__ == "1.4", "[Version WARNING] please try `pip install parl==1.3.1` or `pip install parl==1.4` "
-assert gym.__version__ == "0.18.0", "[Version WARNING] please try `pip install gym==0.18.0`"
 
-import os
-import gym
 import numpy as np
-import parl
-
 from agent import Agent
 from model import Model
 from algorithm import PolicyGradient  # from parl.algorithms import PolicyGradient
-
 from parl.utils import logger
+
+assert paddle.__version__ == "1.8.5", "[Version WARNING] please try `pip install paddlepaddle==1.8.5`"
+assert parl.__version__ == "1.3.1" or parl.__version__ == "1.4", \
+    "[Version WARNING] please try `pip install parl==1.3.1` or `pip install parl==1.4` "
+assert gym.__version__ == "0.18.0", "[Version WARNING] please try `pip install gym==0.18.0`"
 
 LEARNING_RATE = 1e-3
 
@@ -61,11 +58,11 @@ def evaluate(env, agent, render=False):
         episode_reward = 0
         while True:
             action = agent.predict(obs)
-            obs, reward, isOver, _ = env.step(action)
+            obs, reward, is_over, _ = env.step(action)
             episode_reward += reward
             if render:
                 env.render()
-            if isOver:
+            if is_over:
                 break
         eval_reward.append(episode_reward)
     return np.mean(eval_reward)

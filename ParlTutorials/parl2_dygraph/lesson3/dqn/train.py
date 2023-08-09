@@ -12,27 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # 检查版本
 import gym
 import parl
 import paddle
-assert paddle.__version__ == "2.2.0", "[Version WARNING] please try `pip install paddlepaddle==2.2.0`"
-assert parl.__version__ == "2.0.3", "[Version WARNING] please try `pip install parl==2.0.3`"
-assert gym.__version__ == "0.18.0", "[Version WARNING] please try `pip install gym==0.18.0`"
 
-import os
-import gym
 import numpy as np
-import parl
 from parl.utils import logger  # 日志打印工具
-
 from model import Model
 from algorithm import DQN  # from parl.algorithms import DQN
 from agent import Agent
-
 from replay_memory import ReplayMemory
+
+assert gym.__version__ == "0.18.0", "[Version WARNING] please try `pip install gym==0.18.0`"
+assert parl.__version__ == "2.0.3", "[Version WARNING] please try `pip install parl==2.0.3`"
+assert paddle.__version__ == "2.2.0", "[Version WARNING] please try `pip install paddlepaddle==2.2.0`"
 
 LEARN_FREQ = 5  # 训练频率，不需要每一个step都learn，攒一些新增经验后再learn，提高效率
 MEMORY_SIZE = 200000  # replay memory的大小，越大越占用内存

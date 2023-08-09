@@ -22,11 +22,11 @@ from parl import layers
 
 class Agent(parl.Agent):
     def __init__(self, algorithm, obs_dim, act_dim):
-        # self.fluid_executor = fluid.Executor()
-        # self.predict_program = None
-        # self.learn_program = None
-        # self.act_prob = None
-        # self.cost = None
+        self.fluid_executor = fluid.Executor()
+        self.predict_program = None
+        self.learn_program = None
+        self.act_prob = None
+        self.cost = None
 
         self.obs_dim = obs_dim
         self.act_dim = act_dim
