@@ -12,21 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 
+import paddle.fluid as fluid
 import parl
 from parl import layers
 
 
 class Model(parl.Model):
-    def parameters(self):
-        pass
-
-    def forward(self, *args, **kwargs):
-        pass
-
     def __init__(self, act_dim):
-        super().__init__()
         self.actor_model = ActorModel(act_dim)
         self.critic_model = CriticModel()
 
@@ -41,14 +35,7 @@ class Model(parl.Model):
 
 
 class ActorModel(parl.Model):
-    def parameters(self):
-        pass
-
-    def forward(self, *args, **kwargs):
-        pass
-
     def __init__(self, act_dim):
-        super().__init__()
         hid_size = 100
 
         self.fc1 = layers.fc(size=hid_size, act='relu')
@@ -61,14 +48,7 @@ class ActorModel(parl.Model):
 
 
 class CriticModel(parl.Model):
-    def parameters(self):
-        pass
-
-    def forward(self, *args, **kwargs):
-        pass
-
     def __init__(self):
-        super().__init__()
         hid_size = 100
 
         self.fc1 = layers.fc(size=hid_size, act='relu')
@@ -77,6 +57,6 @@ class CriticModel(parl.Model):
     def value(self, obs, act):
         concat = layers.concat([obs, act], axis=1)
         hid = self.fc1(concat)
-        q = self.fc2(hid)
-        q = layers.squeeze(q, axes=[1])
-        return q
+        Q = self.fc2(hid)
+        Q = layers.squeeze(Q, axes=[1])
+        return Q

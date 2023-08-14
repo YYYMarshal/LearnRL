@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 
 import parl
 from parl import layers
@@ -21,10 +21,12 @@ from paddle import fluid
 
 
 class DDPG(parl.Algorithm):
-    def sample(self, *args, **kwargs):
-        pass
-
-    def __init__(self, model, gamma=None, tau=None, actor_lr=None, critic_lr=None):
+    def __init__(self,
+                 model,
+                 gamma=None,
+                 tau=None,
+                 actor_lr=None,
+                 critic_lr=None):
         """  DDPG algorithm
         
         Args:
@@ -35,7 +37,6 @@ class DDPG(parl.Algorithm):
             actor_lr (float): actor 的学习率
             critic_lr (float): critic 的学习率
         """
-        super().__init__(model)
         assert isinstance(gamma, float)
         assert isinstance(tau, float)
         assert isinstance(actor_lr, float)
@@ -63,22 +64,22 @@ class DDPG(parl.Algorithm):
 
     def _actor_learn(self, obs):
         action = self.model.policy(obs)
-        q = self.model.value(obs, action)
-        cost = layers.reduce_mean(-1.0 * q)
+        Q = self.model.value(obs, action)
+        cost = layers.reduce_mean(-1.0 * Q)
         optimizer = fluid.optimizer.AdamOptimizer(self.actor_lr)
         optimizer.minimize(cost, parameter_list=self.model.get_actor_params())
         return cost
 
     def _critic_learn(self, obs, action, reward, next_obs, terminal):
         next_action = self.target_model.policy(next_obs)
-        next_q = self.target_model.value(next_obs, next_action)
+        next_Q = self.target_model.value(next_obs, next_action)
 
         terminal = layers.cast(terminal, dtype='float32')
-        target_q = reward + (1.0 - terminal) * self.gamma * next_q
-        target_q.stop_gradient = True
+        target_Q = reward + (1.0 - terminal) * self.gamma * next_Q
+        target_Q.stop_gradient = True
 
-        q = self.model.value(obs, action)
-        cost = layers.square_error_cost(q, target_q)
+        Q = self.model.value(obs, action)
+        cost = layers.square_error_cost(Q, target_Q)
         cost = layers.reduce_mean(cost)
         optimizer = fluid.optimizer.AdamOptimizer(self.critic_lr)
         optimizer.minimize(cost)
@@ -90,5 +91,6 @@ class DDPG(parl.Algorithm):
         if decay is None:
             decay = 1.0 - self.tau
         self.model.sync_weights_to(
-            self.target_model, decay=decay,
+            self.target_model,
+            decay=decay,
             share_vars_parallel_executor=share_vars_parallel_executor)

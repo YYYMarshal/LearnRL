@@ -39,8 +39,8 @@ class ReplayMemory(object):
             done_batch.append(done)
 
         return np.array(obs_batch).astype('float32'), \
-               np.array(action_batch).astype('float32'), np.array(reward_batch).astype('float32'), \
-               np.array(next_obs_batch).astype('float32'), np.array(done_batch).astype('float32')
+            np.array(action_batch).astype('float32'), np.array(reward_batch).astype('float32'),\
+            np.array(next_obs_batch).astype('float32'), np.array(done_batch).astype('float32')
 
     def __len__(self):
         return len(self.buffer)
