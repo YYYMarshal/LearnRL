@@ -41,8 +41,7 @@ class Agent(parl.Agent):
                 name='obs', shape=[self.obs_dim], dtype='float32')
             self.act_prob = self.alg.predict(obs)
 
-        with fluid.program_guard(
-                self.learn_program):  # 搭建计算图用于 更新policy网络，定义输入输出变量
+        with fluid.program_guard(self.learn_program):  # 搭建计算图用于 更新policy网络，定义输入输出变量
             obs = layers.data(
                 name='obs', shape=[self.obs_dim], dtype='float32')
             act = layers.data(name='act', shape=[1], dtype='int64')

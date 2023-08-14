@@ -12,19 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # 检查paddle和parl的版本
 import gym
 import parl
 import paddle
-assert paddle.__version__ == "1.8.5", "[Version WARNING] please try `pip install paddlepaddle==1.8.5`"
-assert parl.__version__ == "1.3.1" or parl.__version__ == "1.4", "[Version WARNING] please try `pip install parl==1.3.1` or `pip install parl==1.4` "
-assert gym.__version__ == "0.18.0", "[Version WARNING] please try `pip install gym==0.18.0`"
 
-import gym
 import numpy as np
-import parl
 from parl.utils import logger
 
 from agent import Agent
@@ -32,6 +27,11 @@ from model import Model
 from algorithm import DDPG  # from parl.algorithms import DDPG
 from env import ContinuousCartPoleEnv
 from replay_memory import ReplayMemory
+
+assert paddle.__version__ == "1.8.5", "[Version WARNING] please try `pip install paddlepaddle==1.8.5`"
+assert parl.__version__ == "1.3.1" or parl.__version__ == "1.4", \
+    "[Version WARNING] please try `pip install parl==1.3.1` or `pip install parl==1.4` "
+assert gym.__version__ == "0.18.0", "[Version WARNING] please try `pip install gym==0.18.0`"
 
 ACTOR_LR = 1e-3  # Actor网络的 learning rate
 CRITIC_LR = 1e-3  # Critic网络的 learning rate
@@ -60,7 +60,7 @@ def run_episode(agent, env, rpm):
 
         next_obs, reward, done, info = env.step(action)
 
-        action = [action]  # 方便存入replaymemory
+        action = [action]  # 方便存入 replay memory
         rpm.append((obs, action, REWARD_SCALE * reward, next_obs, done))
 
         if len(rpm) > MEMORY_WARMUP_SIZE and (steps % 5) == 0:
