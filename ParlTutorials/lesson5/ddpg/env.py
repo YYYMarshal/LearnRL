@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Classic cart-pole system implemented by Rich Sutton et al.
 Copied from http://incompleteideas.net/sutton/book/code/pole.c
@@ -34,6 +34,12 @@ class ContinuousCartPoleEnv(gym.Env):
     }
 
     def __init__(self):
+        self.carttrans = None
+        self.poletrans = None
+        self.axle = None
+        self.track = None
+        self.np_random = None
+
         self.gravity = 9.8
         self.masscart = 1.0
         self.masspole = 0.1
@@ -58,7 +64,7 @@ class ContinuousCartPoleEnv(gym.Env):
         ])
 
         self.action_space = spaces.Box(
-            low=self.min_action, high=self.max_action, shape=(1, ))
+            low=self.min_action, high=self.max_action, shape=(1,))
         self.observation_space = spaces.Box(-high, high)
 
         self.seed()
@@ -71,14 +77,14 @@ class ContinuousCartPoleEnv(gym.Env):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
-    def stepPhysics(self, force):
+    def step_physics(self, force):
         x, x_dot, theta, theta_dot = self.state
         costheta = math.cos(theta)
         sintheta = math.sin(theta)
         temp = (force + self.polemass_length * theta_dot * theta_dot * sintheta
                 ) / self.total_mass
         thetaacc = (self.gravity * sintheta - costheta * temp) / \
-            (self.length * (4.0/3.0 - self.masspole * costheta * costheta / self.total_mass))
+                   (self.length * (4.0 / 3.0 - self.masspole * costheta * costheta / self.total_mass))
         xacc = temp - self.polemass_length * thetaacc * costheta / self.total_mass
         x = x + self.tau * x_dot
         x_dot = x_dot + self.tau * xacc
@@ -92,12 +98,12 @@ class ContinuousCartPoleEnv(gym.Env):
             "%r (%s) invalid" % (action, type(action))
         # Cast action to float to strip np trappings
         force = self.force_mag * float(action)
-        self.state = self.stepPhysics(force)
+        self.state = self.step_physics(force)
         x, x_dot, theta, theta_dot = self.state
         done = x < -self.x_threshold \
-            or x > self.x_threshold \
-            or theta < -self.theta_threshold_radians \
-            or theta > self.theta_threshold_radians
+               or x > self.x_threshold \
+               or theta < -self.theta_threshold_radians \
+               or theta > self.theta_threshold_radians
         done = bool(done)
 
         if not done:
@@ -119,7 +125,7 @@ Any further steps are undefined behavior.
         return np.array(self.state), reward, done, {}
 
     def reset(self):
-        self.state = self.np_random.uniform(low=-0.05, high=0.05, size=(4, ))
+        self.state = self.np_random.uniform(low=-0.05, high=0.05, size=(4,))
         self.steps_beyond_done = None
         return np.array(self.state)
 

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import numpy as np
 import parl
@@ -22,6 +22,12 @@ from paddle import fluid
 
 class Agent(parl.Agent):
     def __init__(self, algorithm, obs_dim, act_dim):
+        self.fluid_executor = fluid.Executor()
+        self.predict_program = None
+        self.learn_program = None
+        self.predict_act = None
+        self.critic_cost = None
+
         assert isinstance(obs_dim, int)
         assert isinstance(act_dim, int)
         self.obs_dim = obs_dim
@@ -32,13 +38,13 @@ class Agent(parl.Agent):
         self.alg.sync_target(decay=0)
 
     def build_program(self):
-        self.pred_program = fluid.Program()
+        self.predict_program = fluid.Program()
         self.learn_program = fluid.Program()
 
-        with fluid.program_guard(self.pred_program):
+        with fluid.program_guard(self.predict_program):
             obs = layers.data(
                 name='obs', shape=[self.obs_dim], dtype='float32')
-            self.pred_act = self.alg.predict(obs)
+            self.predict_act = self.alg.predict(obs)
 
         with fluid.program_guard(self.learn_program):
             obs = layers.data(
@@ -55,8 +61,8 @@ class Agent(parl.Agent):
     def predict(self, obs):
         obs = np.expand_dims(obs, axis=0)
         act = self.fluid_executor.run(
-            self.pred_program, feed={'obs': obs},
-            fetch_list=[self.pred_act])[0]
+            self.predict_program, feed={'obs': obs},
+            fetch_list=[self.predict_act])[0]
         act = np.squeeze(act)
         return act
 
