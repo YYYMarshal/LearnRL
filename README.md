@@ -1,6 +1,42 @@
 Time: 2023-7
 
-EasyRL
+# 运行环境
+
+## ParlTutorials
+
+```cmd
+conda create -n parltutorials python=3.7
+conda activate parltutorials
+pip install -r path\requirements.txt
+```
+
+requirements.txt 的内容如下：
+
+```cmd
+# requirements for tutorials (paddle fluid version)
+paddlepaddle==1.8.5
+parl==1.4
+gym==0.18.0
+atari-py==0.2.6
+rlschool==0.3.1
+```
+
+```cmd
+pip install protobuf==3.20
+```
+
+## HandsOnRL
+
+```cmd
+conda create -n hrl python=3.8
+conda activate hrl
+pip install matplotlib
+
+pip install setuptools==63.2.0
+pip install gym==0.18.3
+```
+
+## EasyRL
 
 ```cmd
 # python: 3.7
@@ -14,7 +50,7 @@ pip install gym==0.25.2
 pip install pygame
 ```
 
-bili
+## bili
 
 ```cmd
 # python: 3.9
