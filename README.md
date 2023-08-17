@@ -34,6 +34,9 @@ pip install matplotlib
 
 pip install setuptools==63.2.0
 pip install gym==0.18.3
+
+conda install jupyter
+conda install nb_conda
 ```
 
 ## EasyRL
