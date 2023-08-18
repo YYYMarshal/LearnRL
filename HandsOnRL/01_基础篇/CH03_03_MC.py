@@ -1,7 +1,7 @@
 """
 Monte-Carlo methods
 """
-from CH03_MDP import *
+from CH03_02_MDP import *
 
 
 def sample(mdp, pi, _timestep_max, number):

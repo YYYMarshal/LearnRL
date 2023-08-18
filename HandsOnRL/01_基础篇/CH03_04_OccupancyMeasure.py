@@ -1,4 +1,4 @@
-from CH03_MC import *
+from CH03_03_MC import *
 
 
 def occupancy(_episodes, s, a, _timestep_max, _gamma):

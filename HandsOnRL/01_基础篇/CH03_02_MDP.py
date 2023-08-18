@@ -2,7 +2,7 @@
 Markov Decision Process, MDP
 """
 import numpy as np
-from CH03_MRP import compute
+from CH03_01_MRP import compute
 
 S = ["s1", "s2", "s3", "s4", "s5"]  # 状态集合
 A = ["保持s1", "前往s1", "前往s2", "前往s3", "前往s4", "前往s5", "概率前往"]  # 动作集合
@@ -76,4 +76,3 @@ R_from_mdp_to_mrp = [-0.5, -1.5, -1.0, 5.5, 0]
 
 V = compute(P_from_mdp_to_mrp, R_from_mdp_to_mrp, gamma, 5)
 print("MDP中每个状态价值分别为\n", V)
-
