@@ -20,7 +20,8 @@ class CliffWalkingEnv:
         next_state = self.y * self.ncol + self.x
         reward = -1
         done = False
-        if self.y == self.nrow - 1 and self.x > 0:  # 下一个位置在悬崖或者目标
+        # 下一个位置在悬崖或者目标
+        if self.y == self.nrow - 1 and self.x > 0:
             done = True
             if self.x != self.ncol - 1:
                 reward = -100
@@ -43,7 +44,8 @@ class Sarsa:
         self.gamma = gamma  # 折扣因子
         self.epsilon = epsilon  # epsilon-贪婪策略中的参数
 
-    def take_action(self, state):  # 选取下一步的操作,具体实现为epsilon-贪婪
+    # 选取下一步的操作,具体实现为epsilon-贪婪
+    def take_action(self, state):
         if np.random.random() < self.epsilon:
             action = np.random.randint(self.n_action)
         else:
@@ -53,17 +55,18 @@ class Sarsa:
     def best_action(self, state):  # 用于打印策略
         q_max = np.max(self.Q_table[state])
         a = [0 for _ in range(self.n_action)]
-        for i in range(self.n_action):  # 若两个动作的价值一样,都会记录下来
+        # 若两个动作的价值一样,都会记录下来
+        for i in range(self.n_action):
             if self.Q_table[state, i] == q_max:
                 a[i] = 1
         return a
 
-    def update(self, s0, a0, r, s1, a1):
-        td_error = r + self.gamma * self.Q_table[s1, a1] - self.Q_table[s0, a0]
-        self.Q_table[s0, a0] += self.alpha * td_error
+    def update(self, s, a, r, next_s, next_a):
+        td_error = r + self.gamma * self.Q_table[next_s, next_a] - self.Q_table[s, a]
+        self.Q_table[s, a] += self.alpha * td_error
 
 
-def print_agent(agent, env, action_meaning, disaster=[], end=[]):
+def print_agent(agent, env, action_meaning, disaster: [], end: []):
     for i in range(env.nrow):
         for j in range(env.ncol):
             if (i * env.ncol + j) in disaster:
@@ -94,7 +97,8 @@ def main_sarsa():
     for i in range(10):  # 显示10个进度条
         # tqdm的进度条功能
         with tqdm(total=int(num_episodes / 10), desc='Iteration %d' % i) as pbar:
-            for i_episode in range(int(num_episodes / 10)):  # 每个进度条的序列数
+            # 每个进度条的序列数
+            for i_episode in range(int(num_episodes / 10)):
                 episode_return = 0
                 state = env.reset()
                 action = agent.take_action(state)
@@ -102,7 +106,8 @@ def main_sarsa():
                 while not done:
                     next_state, reward, done = env.step(action)
                     next_action = agent.take_action(next_state)
-                    episode_return += reward  # 这里回报的计算不进行折扣因子衰减
+                    # 这里回报的计算不进行折扣因子衰减
+                    episode_return += reward
                     agent.update(state, action, reward, next_state, next_action)
                     state = next_state
                     action = next_action
@@ -236,5 +241,5 @@ def main_n_step_sarsa():
 
 
 if __name__ == '__main__':
-    # main_sarsa()
-    main_n_step_sarsa()
+    main_sarsa()
+    # main_n_step_sarsa()

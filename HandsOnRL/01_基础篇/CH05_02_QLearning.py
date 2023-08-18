@@ -8,7 +8,8 @@ class QLearning:
     """ Q-learning算法 """
 
     def __init__(self, ncol, nrow, epsilon, alpha, gamma, n_action=4):
-        self.Q_table = np.zeros([nrow * ncol, n_action])  # 初始化Q(s,a)表格
+        # 初始化Q(s,a)表格
+        self.Q_table = np.zeros([nrow * ncol, n_action])
         self.n_action = n_action  # 动作个数
         self.alpha = alpha  # 学习率
         self.gamma = gamma  # 折扣因子
@@ -29,10 +30,9 @@ class QLearning:
                 a[i] = 1
         return a
 
-    def update(self, s0, a0, r, s1):
-        td_error = r + self.gamma * self.Q_table[s1].max() - \
-                   self.Q_table[s0, a0]
-        self.Q_table[s0, a0] += self.alpha * td_error
+    def update(self, s, a, r, next_s):
+        td_error = r + self.gamma * self.Q_table[next_s].max() - self.Q_table[s, a]
+        self.Q_table[s, a] += self.alpha * td_error
 
 
 def main():
