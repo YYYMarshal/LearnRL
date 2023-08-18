@@ -37,6 +37,8 @@ pip install gym==0.18.3
 
 conda install jupyter
 conda install nb_conda
+
+conda install tqdm
 ```
 
 ## EasyRL

@@ -229,7 +229,7 @@ def frozen_lake_policy_iteration():
     print_agent(agent, action_meaning, [5, 7, 11, 12], [15])
 
 
-def frozken_lake_value_iteration():
+def frozen_lake_value_iteration():
     env = create_env_frozen_lake()
     action_meaning = ['<', 'v', '>', '^']
     theta = 1e-5
@@ -243,4 +243,4 @@ if __name__ == '__main__':
     # main_policy_iteration()
     # main_value_iteration()
     # frozen_lake_policy_iteration()
-    frozken_lake_value_iteration()
+    frozen_lake_value_iteration()

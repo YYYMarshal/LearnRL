@@ -108,7 +108,7 @@ def main_epsilon_greedy():
     bandit_10_arm = BernoulliBandit(k)
     """
     因为书中是用 Jupyter Notebook，所以 bandit_10_arm 不用重新定义，
-    但是我这里是分成了多个 main 函数，所以重新定义了 bandit_10_arm，
+    但是我这里是分成了多个 main_sarsa 函数，所以重新定义了 bandit_10_arm，
     这也导致 np.random.seed(1) 的随机种子的改变，所以这里用了两次随机种子。
     """
     np.random.seed(1)
