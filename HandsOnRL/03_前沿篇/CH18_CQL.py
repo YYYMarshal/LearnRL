@@ -50,9 +50,8 @@ class SACContinuous:
     处理连续动作的SAC算法
     """
 
-    def __init__(self, state_dim, hidden_dim, action_dim, action_bound,
-                 actor_lr, critic_lr, alpha_lr, target_entropy, tau, gamma,
-                 device):
+    def __init__(self, state_dim, hidden_dim, action_dim, action_bound, actor_lr,
+                 critic_lr, alpha_lr, target_entropy, tau, gamma, device):
         self.actor = PolicyNetContinuous(state_dim, hidden_dim, action_dim,
                                          action_bound).to(device)  # 策略网络
         self.critic_1 = QValueNetContinuous(state_dim, hidden_dim,
@@ -68,17 +67,13 @@ class SACContinuous:
         # 令目标Q网络的初始参数和Q网络一样
         self.target_critic_1.load_state_dict(self.critic_1.state_dict())
         self.target_critic_2.load_state_dict(self.critic_2.state_dict())
-        self.actor_optimizer = torch.optim.Adam(self.actor.parameters(),
-                                                lr=actor_lr)
-        self.critic_1_optimizer = torch.optim.Adam(self.critic_1.parameters(),
-                                                   lr=critic_lr)
-        self.critic_2_optimizer = torch.optim.Adam(self.critic_2.parameters(),
-                                                   lr=critic_lr)
+        self.actor_optimizer = torch.optim.Adam(self.actor.parameters(), lr=actor_lr)
+        self.critic_1_optimizer = torch.optim.Adam(self.critic_1.parameters(), lr=critic_lr)
+        self.critic_2_optimizer = torch.optim.Adam(self.critic_2.parameters(), lr=critic_lr)
         # 使用alpha的log值,可以使训练结果比较稳定
         self.log_alpha = torch.tensor(np.log(0.01), dtype=torch.float)
         self.log_alpha.requires_grad = True  # 对alpha求梯度
-        self.log_alpha_optimizer = torch.optim.Adam([self.log_alpha],
-                                                    lr=alpha_lr)
+        self.log_alpha_optimizer = torch.optim.Adam([self.log_alpha], lr=alpha_lr)
         self.target_entropy = target_entropy  # 目标熵的大小
         self.gamma = gamma
         self.tau = tau
@@ -320,13 +315,11 @@ def main():
     target_entropy = -env.action_space.shape[0]
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     replay_buffer = rl_utils.ReplayBuffer(buffer_size)
-    agent = SACContinuous(state_dim, hidden_dim, action_dim, action_bound,
-                          actor_lr, critic_lr, alpha_lr, target_entropy, tau,
-                          gamma, device)
+    agent = SACContinuous(state_dim, hidden_dim, action_dim, action_bound, actor_lr,
+                          critic_lr, alpha_lr, target_entropy, tau, gamma, device)
 
-    return_list = rl_utils.train_off_policy_agent(env, agent, num_episodes,
-                                                  replay_buffer, minimal_size,
-                                                  batch_size)
+    return_list = rl_utils.train_off_policy_agent(
+        env, agent, num_episodes, replay_buffer, minimal_size, batch_size)
 
     print("---------------------")
     episodes_list = list(range(len(return_list)))
