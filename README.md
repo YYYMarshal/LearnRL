@@ -30,14 +30,18 @@ pip install protobuf==3.20
 ```cmd
 conda create -n hrl python=3.8
 conda activate hrl
+# 3.7.2
 pip install matplotlib
 
 pip install setuptools==63.2.0
 pip install gym==0.18.3
 
+# 1.0.0
 conda install jupyter
+# 2.2.1
 conda install nb_conda
 
+# 4.65.0
 conda install tqdm
 
 pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
@@ -51,9 +55,9 @@ conda create -n envrl python=3.7
 conda activate envrl
 # PyTorch v1.12.1
 pip install torch==1.10.0+cu113 torchvision==0.11.0+cu113 torchaudio==0.10.0 --extra-index-url https://download.pytorch.org/whl/cu113
-# gym
+
 pip install gym==0.25.2
-// 2.5.0
+# 2.5.0
 pip install pygame
 ```
 
