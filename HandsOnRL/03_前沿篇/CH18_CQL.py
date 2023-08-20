@@ -262,7 +262,7 @@ def main():
     action_dim = env.action_space.shape[0]
     action_bound = env.action_space.high[0]  # 动作最大值
 
-    num_seed = 7
+    num_seed = 0
     random.seed(num_seed)
     np.random.seed(num_seed)
     env.seed(num_seed)
