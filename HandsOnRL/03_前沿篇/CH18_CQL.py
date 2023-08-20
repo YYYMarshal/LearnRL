@@ -52,18 +52,16 @@ class SACContinuous:
 
     def __init__(self, state_dim, hidden_dim, action_dim, action_bound, actor_lr,
                  critic_lr, alpha_lr, target_entropy, tau, gamma, device):
-        self.actor = PolicyNetContinuous(state_dim, hidden_dim, action_dim,
-                                         action_bound).to(device)  # 策略网络
-        self.critic_1 = QValueNetContinuous(state_dim, hidden_dim,
-                                            action_dim).to(device)  # 第一个Q网络
-        self.critic_2 = QValueNetContinuous(state_dim, hidden_dim,
-                                            action_dim).to(device)  # 第二个Q网络
-        self.target_critic_1 = QValueNetContinuous(state_dim,
-                                                   hidden_dim, action_dim).to(
-            device)  # 第一个目标Q网络
-        self.target_critic_2 = QValueNetContinuous(state_dim,
-                                                   hidden_dim, action_dim).to(
-            device)  # 第二个目标Q网络
+        # 策略网络
+        self.actor = PolicyNetContinuous(state_dim, hidden_dim, action_dim, action_bound).to(device)
+        # 第一个Q网络
+        self.critic_1 = QValueNetContinuous(state_dim, hidden_dim, action_dim).to(device)
+        # 第二个Q网络
+        self.critic_2 = QValueNetContinuous(state_dim, hidden_dim, action_dim).to(device)
+        # 第一个目标Q网络
+        self.target_critic_1 = QValueNetContinuous(state_dim, hidden_dim, action_dim).to(device)
+        # 第二个目标Q网络
+        self.target_critic_2 = QValueNetContinuous(state_dim, hidden_dim, action_dim).to(device)
         # 令目标Q网络的初始参数和Q网络一样
         self.target_critic_1.load_state_dict(self.critic_1.state_dict())
         self.target_critic_2.load_state_dict(self.critic_2.state_dict())
@@ -89,28 +87,21 @@ class SACContinuous:
         entropy = -log_prob
         q1_value = self.target_critic_1(next_states, next_actions)
         q2_value = self.target_critic_2(next_states, next_actions)
-        next_value = torch.min(q1_value,
-                               q2_value) + self.log_alpha.exp() * entropy
+        next_value = torch.min(q1_value, q2_value) + self.log_alpha.exp() * entropy
         td_target = rewards + self.gamma * next_value * (1 - dones)
         return td_target
 
     def soft_update(self, net, target_net):
-        for param_target, param in zip(target_net.parameters(),
-                                       net.parameters()):
-            param_target.data.copy_(param_target.data * (1.0 - self.tau) +
-                                    param.data * self.tau)
+        for param_target, param in zip(target_net.parameters(), net.parameters()):
+            param_target.data.copy_(
+                param_target.data * (1.0 - self.tau) + param.data * self.tau)
 
     def update(self, transition_dict):
-        states = torch.tensor(transition_dict['states'],
-                              dtype=torch.float).to(self.device)
-        actions = torch.tensor(transition_dict['actions'],
-                               dtype=torch.float).view(-1, 1).to(self.device)
-        rewards = torch.tensor(transition_dict['rewards'],
-                               dtype=torch.float).view(-1, 1).to(self.device)
-        next_states = torch.tensor(transition_dict['next_states'],
-                                   dtype=torch.float).to(self.device)
-        dones = torch.tensor(transition_dict['dones'],
-                             dtype=torch.float).view(-1, 1).to(self.device)
+        states = torch.tensor(transition_dict['states'], dtype=torch.float).to(self.device)
+        actions = torch.tensor(transition_dict['actions'], dtype=torch.float).view(-1, 1).to(self.device)
+        rewards = torch.tensor(transition_dict['rewards'], dtype=torch.float).view(-1, 1).to(self.device)
+        next_states = torch.tensor(transition_dict['next_states'], dtype=torch.float).to(self.device)
+        dones = torch.tensor(transition_dict['dones'], dtype=torch.float).view(-1, 1).to(self.device)
         rewards = (rewards + 8.0) / 8.0  # 对倒立摆环境的奖励进行重塑
 
         # 更新两个Q网络
@@ -131,15 +122,13 @@ class SACContinuous:
         entropy = -log_prob
         q1_value = self.critic_1(states, new_actions)
         q2_value = self.critic_2(states, new_actions)
-        actor_loss = torch.mean(-self.log_alpha.exp() * entropy -
-                                torch.min(q1_value, q2_value))
+        actor_loss = torch.mean(-self.log_alpha.exp() * entropy - torch.min(q1_value, q2_value))
         self.actor_optimizer.zero_grad()
         actor_loss.backward()
         self.actor_optimizer.step()
 
         # 更新alpha值
-        alpha_loss = torch.mean(
-            (entropy - self.target_entropy).detach() * self.log_alpha.exp())
+        alpha_loss = torch.mean((entropy - self.target_entropy).detach() * self.log_alpha.exp())
         self.log_alpha_optimizer.zero_grad()
         alpha_loss.backward()
         self.log_alpha_optimizer.step()
@@ -149,31 +138,21 @@ class SACContinuous:
 
 
 class CQL:
-    def __init__(self, state_dim, hidden_dim, action_dim, action_bound,
-                 actor_lr, critic_lr, alpha_lr, target_entropy, tau, gamma,
-                 device, beta, num_random):
-        self.actor = PolicyNetContinuous(state_dim, hidden_dim, action_dim,
-                                         action_bound).to(device)
-        self.critic_1 = QValueNetContinuous(state_dim, hidden_dim,
-                                            action_dim).to(device)
-        self.critic_2 = QValueNetContinuous(state_dim, hidden_dim,
-                                            action_dim).to(device)
-        self.target_critic_1 = QValueNetContinuous(state_dim, hidden_dim,
-                                                   action_dim).to(device)
-        self.target_critic_2 = QValueNetContinuous(state_dim, hidden_dim,
-                                                   action_dim).to(device)
+    def __init__(self, state_dim, hidden_dim, action_dim, action_bound, actor_lr,
+                 critic_lr, alpha_lr, target_entropy, tau, gamma, device, beta, num_random):
+        self.actor = PolicyNetContinuous(state_dim, hidden_dim, action_dim, action_bound).to(device)
+        self.critic_1 = QValueNetContinuous(state_dim, hidden_dim, action_dim).to(device)
+        self.critic_2 = QValueNetContinuous(state_dim, hidden_dim, action_dim).to(device)
+        self.target_critic_1 = QValueNetContinuous(state_dim, hidden_dim, action_dim).to(device)
+        self.target_critic_2 = QValueNetContinuous(state_dim, hidden_dim, action_dim).to(device)
         self.target_critic_1.load_state_dict(self.critic_1.state_dict())
         self.target_critic_2.load_state_dict(self.critic_2.state_dict())
-        self.actor_optimizer = torch.optim.Adam(self.actor.parameters(),
-                                                lr=actor_lr)
-        self.critic_1_optimizer = torch.optim.Adam(self.critic_1.parameters(),
-                                                   lr=critic_lr)
-        self.critic_2_optimizer = torch.optim.Adam(self.critic_2.parameters(),
-                                                   lr=critic_lr)
+        self.actor_optimizer = torch.optim.Adam(self.actor.parameters(), lr=actor_lr)
+        self.critic_1_optimizer = torch.optim.Adam(self.critic_1.parameters(), lr=critic_lr)
+        self.critic_2_optimizer = torch.optim.Adam(self.critic_2.parameters(), lr=critic_lr)
         self.log_alpha = torch.tensor(np.log(0.01), dtype=torch.float)
         self.log_alpha.requires_grad = True  # 对alpha求梯度
-        self.log_alpha_optimizer = torch.optim.Adam([self.log_alpha],
-                                                    lr=alpha_lr)
+        self.log_alpha_optimizer = torch.optim.Adam([self.log_alpha], lr=alpha_lr)
         self.target_entropy = target_entropy  # 目标熵的大小
         self.gamma = gamma
         self.tau = tau
@@ -188,30 +167,23 @@ class CQL:
         return [action.item()]
 
     def soft_update(self, net, target_net):
-        for param_target, param in zip(target_net.parameters(),
-                                       net.parameters()):
-            param_target.data.copy_(param_target.data * (1.0 - self.tau) +
-                                    param.data * self.tau)
+        for param_target, param in zip(target_net.parameters(), net.parameters()):
+            param_target.data.copy_(
+                param_target.data * (1.0 - self.tau) + param.data * self.tau)
 
     def update(self, transition_dict):
-        states = torch.tensor(transition_dict['states'],
-                              dtype=torch.float).to(self.device)
-        actions = torch.tensor(transition_dict['actions'],
-                               dtype=torch.float).view(-1, 1).to(self.device)
-        rewards = torch.tensor(transition_dict['rewards'],
-                               dtype=torch.float).view(-1, 1).to(self.device)
-        next_states = torch.tensor(transition_dict['next_states'],
-                                   dtype=torch.float).to(self.device)
-        dones = torch.tensor(transition_dict['dones'],
-                             dtype=torch.float).view(-1, 1).to(self.device)
+        states = torch.tensor(transition_dict['states'], dtype=torch.float).to(self.device)
+        actions = torch.tensor(transition_dict['actions'], dtype=torch.float).view(-1, 1).to(self.device)
+        rewards = torch.tensor(transition_dict['rewards'], dtype=torch.float).view(-1, 1).to(self.device)
+        next_states = torch.tensor(transition_dict['next_states'], dtype=torch.float).to(self.device)
+        dones = torch.tensor(transition_dict['dones'], dtype=torch.float).view(-1, 1).to(self.device)
         rewards = (rewards + 8.0) / 8.0  # 对倒立摆环境的奖励进行重塑
 
         next_actions, log_prob = self.actor(next_states)
         entropy = -log_prob
         q1_value = self.target_critic_1(next_states, next_actions)
         q2_value = self.target_critic_2(next_states, next_actions)
-        next_value = torch.min(q1_value,
-                               q2_value) + self.log_alpha.exp() * entropy
+        next_value = torch.min(q1_value, q2_value) + self.log_alpha.exp() * entropy
         td_target = rewards + self.gamma * next_value * (1 - dones)
         critic_1_loss = torch.mean(
             fun.mse_loss(self.critic_1(states, actions), td_target.detach()))
@@ -224,24 +196,16 @@ class CQL:
             [batch_size * self.num_random, actions.shape[-1]],
             dtype=torch.float).uniform_(-1, 1).to(self.device)
         random_unif_log_pi = np.log(0.5 ** next_actions.shape[-1])
-        tmp_states = states.unsqueeze(1).repeat(1, self.num_random,
-                                                1).view(-1, states.shape[-1])
-        tmp_next_states = next_states.unsqueeze(1).repeat(
-            1, self.num_random, 1).view(-1, next_states.shape[-1])
+        tmp_states = states.unsqueeze(1).repeat(1, self.num_random, 1).view(-1, states.shape[-1])
+        tmp_next_states = next_states.unsqueeze(1).repeat(1, self.num_random, 1).view(-1, next_states.shape[-1])
         random_curr_actions, random_curr_log_pi = self.actor(tmp_states)
         random_next_actions, random_next_log_pi = self.actor(tmp_next_states)
-        q1_unif = self.critic_1(tmp_states, random_unif_actions).view(
-            -1, self.num_random, 1)
-        q2_unif = self.critic_2(tmp_states, random_unif_actions).view(
-            -1, self.num_random, 1)
-        q1_curr = self.critic_1(tmp_states, random_curr_actions).view(
-            -1, self.num_random, 1)
-        q2_curr = self.critic_2(tmp_states, random_curr_actions).view(
-            -1, self.num_random, 1)
-        q1_next = self.critic_1(tmp_states, random_next_actions).view(
-            -1, self.num_random, 1)
-        q2_next = self.critic_2(tmp_states, random_next_actions).view(
-            -1, self.num_random, 1)
+        q1_unif = self.critic_1(tmp_states, random_unif_actions).view(-1, self.num_random, 1)
+        q2_unif = self.critic_2(tmp_states, random_unif_actions).view(-1, self.num_random, 1)
+        q1_curr = self.critic_1(tmp_states, random_curr_actions).view(-1, self.num_random, 1)
+        q2_curr = self.critic_2(tmp_states, random_curr_actions).view(-1, self.num_random, 1)
+        q1_next = self.critic_1(tmp_states, random_next_actions).view(-1, self.num_random, 1)
+        q2_next = self.critic_2(tmp_states, random_next_actions).view(-1, self.num_random, 1)
         q1_cat = torch.cat([
             q1_unif - random_unif_log_pi,
             q1_curr - random_curr_log_pi.detach().view(-1, self.num_random, 1),
@@ -274,8 +238,8 @@ class CQL:
         entropy = -log_prob
         q1_value = self.critic_1(states, new_actions)
         q2_value = self.critic_2(states, new_actions)
-        actor_loss = torch.mean(-self.log_alpha.exp() * entropy -
-                                torch.min(q1_value, q2_value))
+        actor_loss = torch.mean(
+            -self.log_alpha.exp() * entropy - torch.min(q1_value, q2_value))
         self.actor_optimizer.zero_grad()
         actor_loss.backward()
         self.actor_optimizer.step()
@@ -297,10 +261,12 @@ def main():
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.shape[0]
     action_bound = env.action_space.high[0]  # 动作最大值
-    random.seed(0)
-    np.random.seed(0)
-    env.seed(0)
-    torch.manual_seed(0)
+
+    num_seed = 7
+    random.seed(num_seed)
+    np.random.seed(num_seed)
+    env.seed(num_seed)
+    torch.manual_seed(num_seed)
 
     actor_lr = 3e-4
     critic_lr = 3e-3
@@ -330,10 +296,10 @@ def main():
     plt.show()
 
     def main_cql():
-        random.seed(0)
-        np.random.seed(0)
-        env.seed(0)
-        torch.manual_seed(0)
+        random.seed(num_seed)
+        np.random.seed(num_seed)
+        env.seed(num_seed)
+        torch.manual_seed(num_seed)
 
         beta = 5.0
         num_random = 5
