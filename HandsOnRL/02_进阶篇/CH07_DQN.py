@@ -8,13 +8,14 @@ import matplotlib.pyplot as plt
 from HandsOnRL.rl_utils import ReplayBuffer, moving_average
 
 
-class Qnet(torch.nn.Module):
+class QNet(torch.nn.Module):
     """
     只有一层隐藏层的Q网络
     """
 
+    # dimensionality：维度
     def __init__(self, state_dim, hidden_dim, action_dim):
-        super(Qnet, self).__init__()
+        super(QNet, self).__init__()
         self.fc1 = torch.nn.Linear(state_dim, hidden_dim)
         self.fc2 = torch.nn.Linear(hidden_dim, action_dim)
 
@@ -32,9 +33,9 @@ class DQN:
                  learning_rate, gamma, epsilon, target_update, device):
         self.action_dim = action_dim
         # Q网络
-        self.q_net = Qnet(state_dim, hidden_dim, self.action_dim).to(device)
+        self.q_net = QNet(state_dim, hidden_dim, action_dim).to(device)
         # 目标网络
-        self.target_q_net = Qnet(state_dim, hidden_dim, self.action_dim).to(device)
+        self.target_q_net = QNet(state_dim, hidden_dim, action_dim).to(device)
         # 使用Adam优化器
         self.optimizer = torch.optim.Adam(self.q_net.parameters(), lr=learning_rate)
         self.gamma = gamma  # 折扣因子
@@ -44,8 +45,10 @@ class DQN:
         self.device = device
 
     def take_action(self, state):  # epsilon-贪婪策略采取动作
+        # 探索
         if np.random.random() < self.epsilon:
             action = np.random.randint(self.action_dim)
+        # 利用
         else:
             # UserWarning: Creating a tensor from a list of numpy.ndarrays is extremely slow.
             # Please consider converting the list to a single numpy.ndarray with

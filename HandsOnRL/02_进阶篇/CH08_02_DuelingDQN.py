@@ -5,7 +5,7 @@ import torch
 import torch.nn.functional as fun
 import matplotlib.pyplot as plt
 import HandsOnRL.rl_utils as rl_utils
-from CH07_02_DoubleDQN import Qnet, train_dqn
+from CH08_01_DoubleDQN import Qnet, train_dqn
 
 
 class VAnet(torch.nn.Module):
