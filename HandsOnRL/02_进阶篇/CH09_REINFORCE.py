@@ -81,6 +81,7 @@ def main():
                 state = env.reset()
                 done = False
                 while not done:
+                    # env.render()
                     action = agent.take_action(state)
                     next_state, reward, done, _ = env.step(action)
                     transition_dict['states'].append(state)
