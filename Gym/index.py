@@ -1,4 +1,10 @@
 import gym
+from gym.utils.env_checker import check_env
+from gym.spaces import Box, Discrete, Dict, Tuple, MultiBinary, MultiDiscrete
+import numpy as np
+from gym.wrappers import RescaleAction  # , ResizeObservation
+from gym.utils.play import play  # , PlayPlot
+import pygame
 
 
 def play_game(name: str, num_episodes=100):
@@ -17,8 +23,69 @@ def play_game(name: str, num_episodes=100):
     env.close()
 
 
+def interacting_with_the_environment():
+    env = gym.make("LunarLander-v2", render_mode="human")
+    env.action_space.seed(42)
+    env.reset(seed=42)
+    for _ in range(1000):
+        observation, reward, terminated, truncated, info = env.step(env.action_space.sample())
+        if terminated or truncated:
+            env.reset()
+    env.close()
+
+
+def checking_api_conformity():
+    env = gym.make("LunarLander-v2", render_mode="human")
+    check_env(env)
+
+
+def spaces():
+    observation_space = Box(low=-1.0, high=2.0, shape=(3,), dtype=np.float32)
+    print(observation_space.sample())
+    observation_space = Discrete(4)
+    print(observation_space.sample())
+    observation_space = Discrete(5, start=-2)
+    print(observation_space.sample())
+    observation_space = Dict({"position": Discrete(2), "velocity": Discrete(3)})
+    print(observation_space.sample())
+    observation_space = Tuple((Discrete(2), Discrete(3)))
+    print(observation_space.sample())
+    observation_space = MultiBinary(5)
+    print(observation_space.sample())
+    observation_space = MultiDiscrete([5, 2, 2])
+    print(observation_space.sample())
+
+
+def wrappers():
+    base_env = gym.make("BipedalWalker-v3")
+    print(base_env.action_space)
+    print(base_env.action_space.sample())
+    wrapped_env = RescaleAction(base_env, min_action=0, max_action=1)
+    print(wrapped_env.action_space)
+
+
+def playing_within_an_environment():
+    env = gym.make('Pong-v4', render_mode="rgb_array_list")
+    env.metadata['render_fps'] = 30
+    # play(env)
+    mapping = {(pygame.K_UP,): 2, (pygame.K_DOWN,): 3}
+    play(env, keys_to_action=mapping)
+
+
+def playing_cart_pole():
+    env = gym.make("CartPole-v1", render_mode="rgb_array")
+    mapping = {(pygame.K_LEFT,): 0, (pygame.K_RIGHT,): 1}
+    play(env, keys_to_action=mapping)
+
+
 def main():
-    play_game("LunarLander-v2", 20)
+    # play_game("LunarLander-v2", 10)
+    # interacting_with_the_environment()
+    # checking_api_conformity()
+    # spaces()
+    # wrappers()
+    playing_within_an_environment()
+    # playing_cart_pole()
 
 
 if __name__ == '__main__':
