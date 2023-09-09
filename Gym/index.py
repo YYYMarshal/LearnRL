@@ -65,10 +65,13 @@ def wrappers():
 
 
 def playing_within_an_environment():
-    env = gym.make('Pong-v4', render_mode="rgb_array_list")
+    # env = gym.make('Pong-v4', render_mode="rgb_array_list")
+    env = gym.make("ALE/Pong-v5", render_mode="rgb_array_list")
     env.metadata['render_fps'] = 30
     # play(env)
-    mapping = {(pygame.K_UP,): 2, (pygame.K_DOWN,): 3}
+    mapping = {(pygame.K_SPACE,): 1,
+               (pygame.K_UP,): 2,
+               (pygame.K_DOWN,): 3}
     play(env, keys_to_action=mapping)
 
 
@@ -89,6 +92,24 @@ def playing_car_racing():
     play(env, keys_to_action=mapping)
 
 
+def playing_ms_pacman():
+    env = gym.make("ALE/MsPacman-v5", render_mode="rgb_array")
+    mapping = {
+        (pygame.K_SPACE,): 0,
+
+        (pygame.K_UP,): 1,
+        (pygame.K_RIGHT,): 2,
+        (pygame.K_LEFT,): 3,
+        (pygame.K_DOWN,): 4,
+
+        (pygame.K_UP, pygame.K_RIGHT): 5,
+        (pygame.K_UP, pygame.K_LEFT): 6,
+        (pygame.K_DOWN, pygame.K_RIGHT): 7,
+        (pygame.K_DOWN, pygame.K_LEFT): 8,
+    }
+    play(env, keys_to_action=mapping, zoom=5)
+
+
 def main():
     # play_game("LunarLander-v2", 10)
     # interacting_with_the_environment()
@@ -98,7 +119,8 @@ def main():
     # playing_within_an_environment()
     # playing_cart_pole()
     # play_game("CarRacing-v2")
-    playing_car_racing()
+    # playing_car_racing()
+    playing_ms_pacman()
 
 
 if __name__ == '__main__':
