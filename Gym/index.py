@@ -78,14 +78,27 @@ def playing_cart_pole():
     play(env, keys_to_action=mapping)
 
 
+def playing_car_racing():
+    env = gym.make("CarRacing-v2", render_mode="rgb_array", continuous=False)
+    # The discrete action space has 5 actions: [do nothing, left, right, gas, brake].
+    mapping = {(pygame.K_LEFT,): 2,
+               (pygame.K_RIGHT,): 1,
+               (pygame.K_UP,): 3,
+               (pygame.K_DOWN,): 4,
+               }
+    play(env, keys_to_action=mapping)
+
+
 def main():
     # play_game("LunarLander-v2", 10)
     # interacting_with_the_environment()
     # checking_api_conformity()
     # spaces()
     # wrappers()
-    playing_within_an_environment()
+    # playing_within_an_environment()
     # playing_cart_pole()
+    # play_game("CarRacing-v2")
+    playing_car_racing()
 
 
 if __name__ == '__main__':
