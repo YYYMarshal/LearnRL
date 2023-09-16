@@ -93,27 +93,38 @@ def main():
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     print(device.type, device)
 
-    env_name = 'CartPole-v0'
+    env_name = "CartPole-v0"
     env = gym.make(env_name)
-    random.seed(0)
-    np.random.seed(0)
-    env.seed(0)
-    torch.manual_seed(0)
+    num_seed = 0
+    random.seed(num_seed)
+    np.random.seed(num_seed)
+    env.seed(num_seed)
+    torch.manual_seed(num_seed)
+
     replay_buffer = ReplayBuffer(buffer_size)
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.n
+    print(f"env.observation_space = {env.observation_space}\n"
+          f"env.observation_space.shape = {env.observation_space.shape}\n"
+          f"env.observation_space.shape[0] = {env.observation_space.shape[0]}\n"
+          f"env.action_space.n = {env.action_space.n}")
     agent = DQN(state_dim, hidden_dim, action_dim, lr, gamma, epsilon, target_update, device)
 
     return_list = []
-    for i in range(10):
-        with tqdm(total=int(num_episodes / 10), desc='Iteration %d' % i) as pbar:
-            for i_episode in range(int(num_episodes / 10)):
+    # 进度条的总数量
+    num_tqdm = 10
+    # 每一个进度条的长度
+    length_tqdm = int(num_episodes / num_tqdm)
+    for i in range(num_tqdm):
+        with tqdm(total=length_tqdm, desc='Iteration %d' % i) as pbar:
+            for i_episode in range(length_tqdm):
                 episode_return = 0
                 state = env.reset()
                 done = False
                 while not done:
                     action = agent.take_action(state)
-                    next_state, reward, done, _ = env.step(action)
+                    # observation, reward, done, info
+                    next_state, reward, done, info = env.step(action)
                     replay_buffer.add(state, action, reward, next_state, done)
                     state = next_state
                     episode_return += reward
@@ -133,6 +144,7 @@ def main():
                     pbar.set_postfix({
                         'episode':
                             '%d' % (num_episodes / 10 * i + i_episode + 1),
+                        # 选择 return_list 最后 10 个数据，然后计算平均值
                         'return':
                             '%.3f' % np.mean(return_list[-10:])
                     })
@@ -140,6 +152,7 @@ def main():
 
     print("---------------------")
     episodes_list = list(range(len(return_list)))
+    # episodes_list = np.arange(1, len(return_list) + 1)
     plt.plot(episodes_list, return_list)
     plt.xlabel('Episodes')
     plt.ylabel('Returns')
