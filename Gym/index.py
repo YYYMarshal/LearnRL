@@ -110,6 +110,17 @@ def playing_ms_pacman():
     play(env, keys_to_action=mapping, zoom=5)
 
 
+def playing_mountain_car():
+    env = gym.make("MountainCar-v0", render_mode="rgb_array")
+    mapping = {
+        (pygame.K_RIGHT,): 2,
+        (pygame.K_LEFT,): 0,
+        (pygame.K_DOWN,): 1
+    }
+    play(env, keys_to_action=mapping)
+    # play(env)
+
+
 def main():
     # play_game("LunarLander-v2", 10)
     # interacting_with_the_environment()
@@ -120,7 +131,8 @@ def main():
     # playing_cart_pole()
     # play_game("CarRacing-v2")
     # playing_car_racing()
-    playing_ms_pacman()
+    # playing_ms_pacman()
+    playing_mountain_car()
 
 
 if __name__ == '__main__':
