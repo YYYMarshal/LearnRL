@@ -32,7 +32,8 @@ class ActorCritic:
     def __init__(self, state_dim, hidden_dim, action_dim, actor_lr, critic_lr, gamma, device):
         # 策略网络
         self.actor = PolicyNet(state_dim, hidden_dim, action_dim).to(device)
-        self.critic = ValueNet(state_dim, hidden_dim).to(device)  # 价值网络
+        # 价值网络
+        self.critic = ValueNet(state_dim, hidden_dim).to(device)
         # 策略网络优化器
         self.actor_optimizer = torch.optim.Adam(self.actor.parameters(), lr=actor_lr)
         self.critic_optimizer = torch.optim.Adam(self.critic.parameters(), lr=critic_lr)  # 价值网络优化器
@@ -76,7 +77,8 @@ def main():
     gamma = 0.98
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
-    env_name = 'CartPole-v0'
+    env_name = "CartPole-v0"
+    # env_name = "Acrobot-v0"
     env = gym.make(env_name)
     env.seed(0)
     torch.manual_seed(0)

@@ -351,10 +351,9 @@ def main_two():
     minimal_size = 500
     batch_size = 64
     target_entropy = -1
-    device = torch.device("cuda") if torch.cuda.is_available() else torch.device(
-        "cpu")
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
-    env_name = 'CartPole-v0'
+    env_name = "CartPole-v0"
     env = gym.make(env_name)
     random.seed(0)
     np.random.seed(0)
