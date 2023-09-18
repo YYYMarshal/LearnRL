@@ -50,11 +50,16 @@ class SACContinuous:
 
     def __init__(self, state_dim, hidden_dim, action_dim, action_bound,
                  actor_lr, critic_lr, alpha_lr, target_entropy, tau, gamma, device):
-        self.actor = PolicyNetContinuous(state_dim, hidden_dim, action_dim, action_bound).to(device)  # 策略网络
-        self.critic_1 = QValueNetContinuous(state_dim, hidden_dim, action_dim).to(device)  # 第一个Q网络
-        self.critic_2 = QValueNetContinuous(state_dim, hidden_dim, action_dim).to(device)  # 第二个Q网络
-        self.target_critic_1 = QValueNetContinuous(state_dim, hidden_dim, action_dim).to(device)  # 第一个目标Q网络
-        self.target_critic_2 = QValueNetContinuous(state_dim, hidden_dim, action_dim).to(device)  # 第二个目标Q网络
+        # 策略网络
+        self.actor = PolicyNetContinuous(state_dim, hidden_dim, action_dim, action_bound).to(device)
+        # 第一个Q网络
+        self.critic_1 = QValueNetContinuous(state_dim, hidden_dim, action_dim).to(device)
+        # 第二个Q网络
+        self.critic_2 = QValueNetContinuous(state_dim, hidden_dim, action_dim).to(device)
+        # 第一个目标Q网络
+        self.target_critic_1 = QValueNetContinuous(state_dim, hidden_dim, action_dim).to(device)
+        # 第二个目标Q网络
+        self.target_critic_2 = QValueNetContinuous(state_dim, hidden_dim, action_dim).to(device)
         # 令目标Q网络的初始参数和Q网络一样
         self.target_critic_1.load_state_dict(self.critic_1.state_dict())
         self.target_critic_2.load_state_dict(self.critic_2.state_dict())
@@ -63,9 +68,11 @@ class SACContinuous:
         self.critic_2_optimizer = torch.optim.Adam(self.critic_2.parameters(), lr=critic_lr)
         # 使用alpha的log值,可以使训练结果比较稳定
         self.log_alpha = torch.tensor(np.log(0.01), dtype=torch.float)
-        self.log_alpha.requires_grad = True  # 可以对alpha求梯度
+        # 可以对alpha求梯度
+        self.log_alpha.requires_grad = True
         self.log_alpha_optimizer = torch.optim.Adam([self.log_alpha], lr=alpha_lr)
-        self.target_entropy = target_entropy  # 目标熵的大小
+        # 目标熵的大小
+        self.target_entropy = target_entropy
         self.gamma = gamma
         self.tau = tau
         self.device = device
@@ -150,14 +157,14 @@ def main_one():
     minimal_size = 1000
     batch_size = 64
     target_entropy = -env.action_space.shape[0]
-    device = torch.device("cuda") if torch.cuda.is_available() else torch.device(
-        "cpu")
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
     replay_buffer = rl_utils.ReplayBuffer(buffer_size)
-    agent = SACContinuous(state_dim, hidden_dim, action_dim, action_bound, actor_lr, critic_lr, alpha_lr,
-                          target_entropy, tau, gamma, device)
+    agent = SACContinuous(state_dim, hidden_dim, action_dim, action_bound, actor_lr,
+                          critic_lr, alpha_lr, target_entropy, tau, gamma, device)
 
-    return_list = rl_utils.train_off_policy_agent(env, agent, num_episodes, replay_buffer, minimal_size, batch_size)
+    return_list = rl_utils.train_off_policy_agent(
+        env, agent, num_episodes, replay_buffer, minimal_size, batch_size)
 
     episodes_list = list(range(len(return_list)))
     plt.plot(episodes_list, return_list)
@@ -209,10 +216,10 @@ class SAC:
         self.critic_1 = QValueNet(state_dim, hidden_dim, action_dim).to(device)
         # 第二个Q网络
         self.critic_2 = QValueNet(state_dim, hidden_dim, action_dim).to(device)
-        self.target_critic_1 = QValueNet(state_dim, hidden_dim,
-                                         action_dim).to(device)  # 第一个目标Q网络
-        self.target_critic_2 = QValueNet(state_dim, hidden_dim,
-                                         action_dim).to(device)  # 第二个目标Q网络
+        # 第一个目标Q网络
+        self.target_critic_1 = QValueNet(state_dim, hidden_dim, action_dim).to(device)
+        # 第二个目标Q网络
+        self.target_critic_2 = QValueNet(state_dim, hidden_dim, action_dim).to(device)
         # 令目标Q网络的初始参数和Q网络一样
         self.target_critic_1.load_state_dict(self.critic_1.state_dict())
         self.target_critic_2.load_state_dict(self.critic_2.state_dict())
@@ -221,9 +228,11 @@ class SAC:
         self.critic_2_optimizer = torch.optim.Adam(self.critic_2.parameters(), lr=critic_lr)
         # 使用alpha的log值,可以使训练结果比较稳定
         self.log_alpha = torch.tensor(np.log(0.01), dtype=torch.float)
-        self.log_alpha.requires_grad = True  # 可以对alpha求梯度
+        # 可以对alpha求梯度
+        self.log_alpha.requires_grad = True
         self.log_alpha_optimizer = torch.optim.Adam([self.log_alpha], lr=alpha_lr)
-        self.target_entropy = target_entropy  # 目标熵的大小
+        # 目标熵的大小
+        self.target_entropy = target_entropy
         self.gamma = gamma
         self.tau = tau
         self.device = device
@@ -253,7 +262,8 @@ class SAC:
 
     def update(self, transition_dict):
         states = torch.tensor(np.array(transition_dict['states']), dtype=torch.float).to(self.device)
-        actions = torch.tensor(transition_dict['actions']).view(-1, 1).to(self.device)  # 动作不再是float类型
+        # 动作不再是float类型
+        actions = torch.tensor(transition_dict['actions']).view(-1, 1).to(self.device)
         rewards = torch.tensor(transition_dict['rewards'], dtype=torch.float).view(-1, 1).to(self.device)
         next_states = torch.tensor(np.array(transition_dict['next_states']), dtype=torch.float).to(self.device)
         dones = torch.tensor(transition_dict['dones'], dtype=torch.float).view(-1, 1).to(self.device)
@@ -261,11 +271,9 @@ class SAC:
         # 更新两个Q网络
         td_target = self.calc_target(rewards, next_states, dones)
         critic_1_q_values = self.critic_1(states).gather(1, actions)
-        critic_1_loss = torch.mean(
-            fun.mse_loss(critic_1_q_values, td_target.detach()))
+        critic_1_loss = torch.mean(fun.mse_loss(critic_1_q_values, td_target.detach()))
         critic_2_q_values = self.critic_2(states).gather(1, actions)
-        critic_2_loss = torch.mean(
-            fun.mse_loss(critic_2_q_values, td_target.detach()))
+        critic_2_loss = torch.mean(fun.mse_loss(critic_2_q_values, td_target.detach()))
         self.critic_1_optimizer.zero_grad()
         critic_1_loss.backward()
         self.critic_1_optimizer.step()
@@ -280,15 +288,15 @@ class SAC:
         entropy = -torch.sum(probs * log_probs, dim=1, keepdim=True)  #
         q1_value = self.critic_1(states)
         q2_value = self.critic_2(states)
-        min_qvalue = torch.sum(probs * torch.min(q1_value, q2_value), dim=1, keepdim=True)  # 直接根据概率计算期望
+        # 直接根据概率计算期望
+        min_qvalue = torch.sum(probs * torch.min(q1_value, q2_value), dim=1, keepdim=True)
         actor_loss = torch.mean(-self.log_alpha.exp() * entropy - min_qvalue)
         self.actor_optimizer.zero_grad()
         actor_loss.backward()
         self.actor_optimizer.step()
 
         # 更新alpha值
-        alpha_loss = torch.mean(
-            (entropy - self.target_entropy).detach() * self.log_alpha.exp())
+        alpha_loss = torch.mean((entropy - self.target_entropy).detach() * self.log_alpha.exp())
         self.log_alpha_optimizer.zero_grad()
         alpha_loss.backward()
         self.log_alpha_optimizer.step()
@@ -320,9 +328,11 @@ def main_two():
     replay_buffer = rl_utils.ReplayBuffer(buffer_size)
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.n
-    agent = SAC(state_dim, hidden_dim, action_dim, actor_lr, critic_lr, alpha_lr, target_entropy, tau, gamma, device)
+    agent = SAC(state_dim, hidden_dim, action_dim, actor_lr, critic_lr,
+                alpha_lr, target_entropy, tau, gamma, device)
 
-    return_list = rl_utils.train_off_policy_agent(env, agent, num_episodes, replay_buffer, minimal_size, batch_size)
+    return_list = rl_utils.train_off_policy_agent(
+        env, agent, num_episodes, replay_buffer, minimal_size, batch_size)
 
     episodes_list = list(range(len(return_list)))
     plt.plot(episodes_list, return_list)
