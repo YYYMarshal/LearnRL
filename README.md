@@ -2,29 +2,6 @@ Time: 2023-7
 
 # 运行环境
 
-## ParlTutorials
-
-```cmd
-conda create -n parltutorials python=3.7
-conda activate parltutorials
-pip install -r path\requirements.txt
-```
-
-requirements.txt 的内容如下：
-
-```cmd
-# requirements for tutorials (paddle fluid version)
-paddlepaddle==1.8.5
-parl==1.4
-gym==0.18.0
-atari-py==0.2.6
-rlschool==0.3.1
-```
-
-```cmd
-pip install protobuf==3.20
-```
-
 ## HandsOnRL
 
 ```cmd
@@ -59,7 +36,49 @@ pip install torch==1.10.0+cu113 torchvision==0.11.0+cu113 torchaudio==0.10.0 --e
 pip install gym==0.25.2
 # 2.5.0
 pip install pygame
+---
+# 跑 附书代码 - DQN 时需要用到的库
+pip install matplotlib
+pip install seaborn
 ```
+
+## Gym
+
+```cmd
+conda create -n gym python=3.8	// 3.8.17
+conda activate gym
+pip install gym	//0.26.2
+pip install swig	//4.1.1
+pip install gym[box2d]	//box2d-py 2.3.5
+pip install gym[other]	//Pong-v0
+pip install ale-py	//Arcade Learning Environment 街机学习环境
+pip install gym[accept-rom-license]
+```
+
+## ParlTutorials
+
+```cmd
+conda create -n parltutorials python=3.7
+conda activate parltutorials
+pip install -r path\requirements.txt
+```
+
+requirements.txt 的内容如下：
+
+```cmd
+# requirements for tutorials (paddle fluid version)
+paddlepaddle==1.8.5
+parl==1.4
+gym==0.18.0
+atari-py==0.2.6
+rlschool==0.3.1
+```
+
+```cmd
+pip install protobuf==3.20
+```
+
+##
 
 ## bili
 
