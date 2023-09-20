@@ -28,9 +28,8 @@ pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --e
 
 ```cmd
 # python: 3.7
-conda create -n envrl python=3.7
-conda activate envrl
-# PyTorch v1.12.1
+conda create -n joyrl python=3.7
+conda activate joyrl
 pip install torch==1.10.0+cu113 torchvision==0.11.0+cu113 torchaudio==0.10.0 --extra-index-url https://download.pytorch.org/whl/cu113
 
 pip install gym==0.25.2
@@ -40,6 +39,34 @@ pip install pygame
 # 跑 附书代码 - DQN 时需要用到的库
 pip install matplotlib
 pip install seaborn
+```
+
+官方给出的方案：
+
+https://github.com/datawhalechina/easy-rl/tree/master/notebooks
+
+```cmd
+conda create -n joyrl python=3.7
+conda activate joyrl
+pip install -r requirements.txt
+
+pip install torch==1.10.0+cu113 torchvision==0.11.0+cu113 torchaudio==0.10.0 --extra-index-url https://download.pytorch.org/whl/cu113
+```
+
+requirements.txt
+
+```cmd
+pyyaml==6.0
+ipykernel==6.15.1
+jupyter==1.0.0
+matplotlib==3.5.3
+seaborn==0.12.1
+dill==0.3.5.1
+argparse==1.4.0
+pandas==1.3.5
+pyglet==1.5.26
+importlib-metadata<5.0
+setuptools==65.2.0
 ```
 
 ## Gym
