@@ -82,7 +82,7 @@ pip install ale-py	//Arcade Learning Environment 街机学习环境
 pip install gym[accept-rom-license]
 ```
 
-## ParlTutorials
+## PARLTutorials
 
 ```cmd
 conda create -n parltutorials python=3.7
@@ -105,7 +105,7 @@ rlschool==0.3.1
 pip install protobuf==3.20
 ```
 
-## bili
+## BiliLSNTOldRL
 
 ```cmd
 # python: 3.9
