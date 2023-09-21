@@ -48,8 +48,8 @@ class QValueNetContinuous(torch.nn.Module):
 class SACContinuous:
     # 处理连续动作的SAC算法
 
-    def __init__(self, state_dim, hidden_dim, action_dim, action_bound,
-                 actor_lr, critic_lr, alpha_lr, target_entropy, tau, gamma, device):
+    def __init__(self, state_dim, hidden_dim, action_dim, action_bound, actor_lr,
+                 critic_lr, alpha_lr, target_entropy, tau, gamma, device):
         # 策略网络
         self.actor = PolicyNetContinuous(state_dim, hidden_dim, action_dim, action_bound).to(device)
         # 第一个Q网络

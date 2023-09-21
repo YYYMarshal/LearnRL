@@ -43,8 +43,8 @@ def compute_advantage(gamma, lmbda, td_delta):
 class TRPO:
     """ TRPO算法 """
 
-    def __init__(self, hidden_dim, state_space, action_space, lmbda, kl_constraint,
-                 alpha, critic_lr, gamma, device):
+    def __init__(self, hidden_dim, state_space, action_space, lmbda,
+                 kl_constraint, alpha, critic_lr, gamma, device):
         state_dim = state_space.shape[0]
         action_dim = action_space.n
         # 策略网络参数不需要优化器更新
@@ -67,8 +67,9 @@ class TRPO:
     def hessian_matrix_vector_product(self, states, old_action_dists, vector):
         # 计算黑塞矩阵和一个向量的乘积
         new_action_dists = torch.distributions.Categorical(self.actor(states))
+        # 计算平均KL距离
         kl = torch.mean(
-            torch.distributions.kl.kl_divergence(old_action_dists, new_action_dists))  # 计算平均KL距离
+            torch.distributions.kl.kl_divergence(old_action_dists, new_action_dists))
         kl_grad = torch.autograd.grad(kl, self.actor.parameters(), create_graph=True)
         kl_grad_vector = torch.cat([grad.view(-1) for grad in kl_grad])
         # KL距离的梯度先和向量进行点积运算
@@ -165,8 +166,8 @@ def main_one():
     num_seed = 2013
     env.seed(num_seed)
     torch.manual_seed(num_seed)
-    agent = TRPO(hidden_dim, env.observation_space, env.action_space, lmbda, kl_constraint,
-                 alpha, critic_lr, gamma, device)
+    agent = TRPO(hidden_dim, env.observation_space, env.action_space, lmbda,
+                 kl_constraint, alpha, critic_lr, gamma, device)
     return_list = rl_utils.train_on_policy_agent(env, agent, num_episodes)
 
     episodes_list = list(range(len(return_list)))
@@ -319,8 +320,8 @@ def main_two():
     env = gym.make(env_name)
     env.seed(0)
     torch.manual_seed(0)
-    agent = TRPOContinuous(hidden_dim, env.observation_space, env.action_space, lmbda, kl_constraint, alpha, critic_lr,
-                           gamma, device)
+    agent = TRPOContinuous(hidden_dim, env.observation_space, env.action_space, lmbda,
+                           kl_constraint, alpha, critic_lr, gamma, device)
     return_list = rl_utils.train_on_policy_agent(env, agent, num_episodes)
 
     episodes_list = list(range(len(return_list)))

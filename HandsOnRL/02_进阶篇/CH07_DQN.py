@@ -142,11 +142,9 @@ def main():
                 return_list.append(episode_return)
                 if (i_episode + 1) % 10 == 0:
                     pbar.set_postfix({
-                        'episode':
-                            '%d' % (num_episodes / 10 * i + i_episode + 1),
+                        'episode': '%d' % (num_episodes / 10 * i + i_episode + 1),
                         # 选择 return_list 最后 10 个数据，然后计算平均值
-                        'return':
-                            '%.3f' % np.mean(return_list[-10:])
+                        'return': '%.3f' % np.mean(return_list[-10:])
                     })
                 pbar.update(1)
 

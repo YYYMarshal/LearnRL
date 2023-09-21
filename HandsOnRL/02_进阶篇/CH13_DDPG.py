@@ -36,7 +36,8 @@ class QValueNet(torch.nn.Module):
 
 
 class DDPG:
-    def __init__(self, state_dim, hidden_dim, action_dim, action_bound, sigma, actor_lr, critic_lr, tau, gamma, device):
+    def __init__(self, state_dim, hidden_dim, action_dim, action_bound,
+                 sigma, actor_lr, critic_lr, tau, gamma, device):
         self.actor = PolicyNet(state_dim, hidden_dim, action_dim, action_bound).to(device)
         self.critic = QValueNet(state_dim, hidden_dim, action_dim).to(device)
         self.target_actor = PolicyNet(state_dim, hidden_dim, action_dim, action_bound).to(device)
@@ -110,9 +111,11 @@ def main():
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.shape[0]
     action_bound = env.action_space.high[0]  # 动作最大值
-    agent = DDPG(state_dim, hidden_dim, action_dim, action_bound, sigma, actor_lr, critic_lr, tau, gamma, device)
+    agent = DDPG(state_dim, hidden_dim, action_dim, action_bound,
+                 sigma, actor_lr, critic_lr, tau, gamma, device)
 
-    return_list = rl_utils.train_off_policy_agent(env, agent, num_episodes, replay_buffer, minimal_size, batch_size)
+    return_list = rl_utils.train_off_policy_agent(
+        env, agent, num_episodes, replay_buffer, minimal_size, batch_size)
 
     episodes_list = list(range(len(return_list)))
     plt.plot(episodes_list, return_list)
