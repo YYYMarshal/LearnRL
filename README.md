@@ -1,8 +1,14 @@
 Time: 2023-7
 
-# 运行环境
+# HandsOnRL
 
-## HandsOnRL
+## 链接
+
+[动手学强化学习](https://hrl.boyuai.com/chapter/intro)
+
+[GitHub - Hands-on-RL](https://github.com/boyu-ai/Hands-on-RL)
+
+## 环境
 
 ```cmd
 conda create -n hrl python=3.8
@@ -24,7 +30,15 @@ conda install tqdm
 pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
 ```
 
-## EasyRL
+# EasyRL
+
+## 链接
+
+[蘑菇树EasyRL](https://datawhalechina.github.io/easy-rl/#/?id=%E8%98%91%E8%8F%87%E4%B9%A6easyrl)
+
+[GitHub - easy-rl](https://github.com/datawhalechina/easy-rl)
+
+## 环境
 
 ```cmd
 # python: 3.7
@@ -69,7 +83,13 @@ importlib-metadata<5.0
 setuptools==65.2.0
 ```
 
-## Gym
+# Gym
+
+## 链接
+
+[Gym Documentation](https://www.gymlibrary.dev/)
+
+## 环境
 
 ```cmd
 conda create -n gym python=3.8	// 3.8.17
@@ -82,7 +102,17 @@ pip install ale-py	//Arcade Learning Environment 街机学习环境
 pip install gym[accept-rom-license]
 ```
 
-## PARLTutorials
+# PARLTutorials
+
+## 链接
+
+* [飞桨AI Studio - 世界冠军带你从零实践强化学习](https://aistudio.baidu.com/aistudio/course/introduce/1335)
+  * [bili - 世界冠军带你从零实践强化学习](https://www.bilibili.com/video/BV1yv411i7xd/)
+
+* [GitHub - 强化学习算法框架库 - PARL](https://github.com/PaddlePaddle/PARL/)
+  * [GitHub - 《PARL强化学习入门实践》课程示例](https://github.com/PaddlePaddle/PARL/tree/develop/examples/tutorials)
+
+## 环境
 
 ```cmd
 conda create -n parltutorials python=3.7
@@ -105,7 +135,13 @@ rlschool==0.3.1
 pip install protobuf==3.20
 ```
 
-## BiliLSNTOldRL
+# BiliLSNTOldRL
+
+## 链接
+
+[bili - 蓝斯诺特 - 强化学习 简明教程 代码实战](https://www.bilibili.com/video/BV1Ge4y1i7L6/)
+
+## 环境
 
 ```cmd
 # python: 3.9
