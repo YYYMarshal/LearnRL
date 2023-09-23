@@ -1,4 +1,3 @@
-import matplotlib.lines
 import matplotlib.pyplot as plt
 import numpy as np
 import collections
@@ -137,15 +136,6 @@ def compute_advantage(gamma, lmbda, td_delta):
 
 def plot(x, y, xlabel, ylabel, title):
     plt.plot(x, y)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.title(title)
-    plt.show()
-
-
-def plot_multi(plot_list: [matplotlib.lines.Line2D], xlabel, ylabel, title):
-    for item in plot_list:
-        plt.plot(item.x, item.y, label=item.label, color=item.color, linestyle=item.linestyle)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
