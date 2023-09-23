@@ -49,12 +49,12 @@ class DQN:
             action = self.q_net(state).argmax().item()
         return action
 
-    def update(self, transition_dict):
-        states = torch.tensor(transition_dict['states'], dtype=torch.float).to(self.device)
-        actions = torch.tensor(transition_dict['actions']).view(-1, 1).to(self.device)
-        rewards = torch.tensor(transition_dict['rewards'], dtype=torch.float).view(-1, 1).to(self.device)
-        next_states = torch.tensor(transition_dict['next_states'], dtype=torch.float).to(self.device)
-        dones = torch.tensor(transition_dict['dones'], dtype=torch.float).view(-1, 1).to(self.device)
+    def update(self, b_states, b_actions, b_rewards, b_next_states, b_dones):
+        states = torch.tensor(b_states, dtype=torch.float).to(self.device)
+        actions = torch.tensor(b_actions).view(-1, 1).to(self.device)
+        rewards = torch.tensor(b_rewards, dtype=torch.float).view(-1, 1).to(self.device)
+        next_states = torch.tensor(b_next_states, dtype=torch.float).to(self.device)
+        dones = torch.tensor(b_dones, dtype=torch.float).view(-1, 1).to(self.device)
 
         q_values = self.q_net(states).gather(1, actions)  # Q值
         # 下个状态的最大Q值
@@ -95,7 +95,7 @@ def main():
           f"env.action_space.n = {env.action_space.n}")
 
     agent = DQN(state_dim, action_dim, device, params)
-    params.num_episodes = 50
+    params.num_episodes = 500
     return_list = train_off_policy_agent(env, agent, params, False)
     print("---------------------")
     print(f"mean = {np.mean(return_list)}")

@@ -24,8 +24,8 @@ class ReplayBuffer:
     # 从buffer中采样数据,数量为batch_size
     def sample(self, batch_size):
         transitions = random.sample(self.buffer, batch_size)
-        state, action, reward, next_state, done = zip(*transitions)
-        return np.array(state), action, reward, np.array(next_state), done
+        states, actions, rewards, next_states, dones = zip(*transitions)
+        return np.array(states), actions, rewards, np.array(next_states), dones
 
     # 目前buffer中数据的数量
     def size(self):
@@ -115,15 +115,8 @@ def train_off_policy_agent(env, agent, params: HyperParameters, is_render=False,
             episode_return += reward
             # 当buffer数据的数量超过一定值后,才进行Q网络训练
             if replay_buffer.size() > params.minimal_size:
-                b_s, b_a, b_r, b_ns, b_d = replay_buffer.sample(params.batch_size)
-                transition_dict = {
-                    'states': b_s,
-                    'actions': b_a,
-                    'next_states': b_ns,
-                    'rewards': b_r,
-                    'dones': b_d
-                }
-                agent.update(transition_dict)
+                b_states, b_actions, b_rewards, b_next_states, b_dones = replay_buffer.sample(params.batch_size)
+                agent.update(b_states, b_actions, b_rewards, b_next_states, b_dones)
         print(f"episode = {episode}, episode_return = {episode_return}")
         return_list.append(episode_return)
     # 最后一次的 env.render() 没有关闭，所以在这里关闭一下。
