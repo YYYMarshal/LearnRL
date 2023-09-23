@@ -28,6 +28,21 @@ conda install nb_conda
 conda install tqdm
 
 pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
+
+# 2023-9-23
+
+# 下面两个是为了运行 Gym - Atari
+# ale-py-0.8.1, importlib-metadata-6.8.0
+pip install ale-py
+# atari-py-0.2.9, opencv-python-4.8.0.76
+pip install gym[atari]
+# python -m atari_py.import_roms S:\YYYXUEBING\Project\PyCharm\EnvRL
+
+## Gym - Box2D
+# 4.1.1
+pip install swig
+# box2d-py-2.3.8
+pip install gym[box2d]
 ```
 
 # EasyRL

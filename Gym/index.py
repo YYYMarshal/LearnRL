@@ -7,9 +7,9 @@ from gym.utils.play import play  # , PlayPlot
 import pygame
 
 
-def play_game(name: str, num_episodes=100):
+def play_game(env_name: str, num_episodes=100):
     # 创建游戏场景
-    env = gym.make(name, render_mode='human')
+    env = gym.make(env_name, render_mode='human')
     for episode in range(num_episodes):
         print(f"episode = {episode + 1}")
         env.reset()
@@ -123,6 +123,7 @@ def playing_mountain_car():
 
 def main():
     # play_game("LunarLander-v2", 10)
+    play_game("Adventure-v4", 10)
     # interacting_with_the_environment()
     # checking_api_conformity()
     # spaces()
@@ -132,7 +133,7 @@ def main():
     # play_game("CarRacing-v2")
     # playing_car_racing()
     # playing_ms_pacman()
-    playing_mountain_car()
+    # playing_mountain_car()
 
 
 if __name__ == '__main__':

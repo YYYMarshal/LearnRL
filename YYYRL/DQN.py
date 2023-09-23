@@ -78,6 +78,9 @@ def main():
     print(f"device.type = {device.type}, device = {device}")
 
     env_name = "CartPole-v0"
+    # env_name = "Acrobot-v1"
+    # env_name = "MountainCar-v0"
+    # env_name = "LunarLander-v2"
     env = gym.make(env_name)
 
     num_seed = params.num_seed
@@ -96,7 +99,7 @@ def main():
 
     agent = DQN(state_dim, action_dim, device, params)
     params.num_episodes = 500
-    return_list = train_off_policy_agent(env, agent, params, False)
+    return_list = train_off_policy_agent(env, agent, params, True)
     print("---------------------")
     print(f"mean = {np.mean(return_list)}")
 
