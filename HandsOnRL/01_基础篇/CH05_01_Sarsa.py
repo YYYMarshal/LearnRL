@@ -213,17 +213,14 @@ def main_n_step_sarsa():
                     next_state, reward, done = env.step(action)
                     next_action = agent.take_action(next_state)
                     episode_return += reward  # 这里回报的计算不进行折扣因子衰减
-                    agent.update(state, action, reward, next_state, next_action,
-                                 done)
+                    agent.update(state, action, reward, next_state, next_action, done)
                     state = next_state
                     action = next_action
                 return_list.append(episode_return)
                 if (i_episode + 1) % 10 == 0:  # 每10条序列打印一下这10条序列的平均回报
                     pbar.set_postfix({
-                        'episode':
-                            '%d' % (num_episodes / 10 * i + i_episode + 1),
-                        'return':
-                            '%.3f' % np.mean(return_list[-10:])
+                        'episode': '%d' % (num_episodes / 10 * i + i_episode + 1),
+                        'return': '%.3f' % np.mean(return_list[-10:])
                     })
                 pbar.update(1)
 
