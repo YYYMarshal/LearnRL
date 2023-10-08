@@ -4,7 +4,8 @@ import gym
 import numpy as np
 import torch
 import torch.nn.functional as fun
-from YYYRL.utility import HyperParameters, train_off_policy_agent, moving_average
+from YYYRL.utility import HyperParameters, train_off_policy_agent, moving_average, OffPolicyTransition
+import matplotlib.pyplot as plt
 
 
 class QNet(torch.nn.Module):
@@ -76,12 +77,12 @@ class DQN:
             action = self.q_net(state).argmax().item()
         return action
 
-    def update(self, b_states, b_actions, b_rewards, b_next_states, b_dones):
-        states = torch.tensor(b_states, dtype=torch.float).to(self.device)
-        actions = torch.tensor(b_actions).view(-1, 1).to(self.device)
-        rewards = torch.tensor(b_rewards, dtype=torch.float).view(-1, 1).to(self.device)
-        next_states = torch.tensor(b_next_states, dtype=torch.float).to(self.device)
-        dones = torch.tensor(b_dones, dtype=torch.float).view(-1, 1).to(self.device)
+    def update(self, transition: OffPolicyTransition):
+        states = torch.tensor(transition.states, dtype=torch.float).to(self.device)
+        actions = torch.tensor(transition.actions).view(-1, 1).to(self.device)
+        rewards = torch.tensor(transition.rewards, dtype=torch.float).view(-1, 1).to(self.device)
+        next_states = torch.tensor(transition.next_states, dtype=torch.float).to(self.device)
+        dones = torch.tensor(transition.dones, dtype=torch.float).view(-1, 1).to(self.device)
 
         q_values = self.q_net(states).gather(1, actions)  # Q值
         # 下个状态的最大Q值
@@ -149,7 +150,6 @@ def main():
     ylabel = "Returns"
     title = f"DQN/DoubleDQN/DuleingDQN on {env_name}"
 
-    import matplotlib.pyplot as plt
     episodes_list = list(range(len(return_list_dqn)))
 
     plt.plot(episodes_list, return_list_dqn, label="DQN", color="blue")

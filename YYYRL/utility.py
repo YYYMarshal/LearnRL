@@ -2,9 +2,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import collections
 import random
-
-from tqdm import tqdm
 import torch
+
+
+class OffPolicyTransition:
+    def __init__(self, states, actions, next_actions, rewards, dones):
+        self.states = states
+        self.actions = actions
+        self.next_states = next_actions
+        self.rewards = rewards
+        self.dones = dones
 
 
 class ReplayBuffer:
@@ -24,7 +31,8 @@ class ReplayBuffer:
     def sample(self, batch_size):
         transitions = random.sample(self.buffer, batch_size)
         states, actions, rewards, next_states, dones = zip(*transitions)
-        return np.array(states), actions, rewards, np.array(next_states), dones
+        transition = OffPolicyTransition(np.array(states), actions, rewards, np.array(next_states), dones)
+        return transition
 
     # 目前buffer中数据的数量
     def size(self):
@@ -68,31 +76,41 @@ def render(env, episode: int, is_render=False, interval_render=1):
             env.close()
 
 
-def train_on_policy_agent(env, agent, num_episodes):
+class OnPolicyTransition:
+    def __init__(self):
+        self.state_list = []
+        self.action_list = []
+        self.next_state_list = []
+        self.reward_list = []
+        self.done_list = []
+
+
+def train_on_policy_agent(env, agent, params: HyperParameters, is_render=False, interval_render=50):
     return_list = []
-    for i in range(10):
-        with tqdm(total=int(num_episodes / 10), desc='Iteration %d' % i) as pbar:
-            for i_episode in range(int(num_episodes / 10)):
-                episode_return = 0
-                transition_dict = {'states': [], 'actions': [], 'next_states': [], 'rewards': [], 'dones': []}
-                state = env.reset()
-                done = False
-                while not done:
-                    action = agent.take_action(state)
-                    next_state, reward, done, _ = env.step(action)
-                    transition_dict['states'].append(state)
-                    transition_dict['actions'].append(action)
-                    transition_dict['next_states'].append(next_state)
-                    transition_dict['rewards'].append(reward)
-                    transition_dict['dones'].append(done)
-                    state = next_state
-                    episode_return += reward
-                return_list.append(episode_return)
-                agent.update(transition_dict)
-                if (i_episode + 1) % 10 == 0:
-                    pbar.set_postfix({'episode': '%d' % (num_episodes / 10 * i + i_episode + 1),
-                                      'return': '%.3f' % np.mean(return_list[-10:])})
-                pbar.update(1)
+    for episode in range(1, params.num_episodes + 1):
+        episode_return = 0
+        transition = OnPolicyTransition()
+        state = env.reset()
+        done = False
+        while not done:
+            render(env=env, episode=episode, is_render=is_render, interval_render=interval_render)
+
+            action = agent.take_action(state)
+            # observation, reward, done, info
+            next_state, reward, done, _ = env.step(action)
+
+            transition.state_list.append(state)
+            transition.action_list.append(action)
+            transition.next_state_list.append(next_state)
+            transition.reward_list.append(reward)
+            transition.done_list.append(done)
+
+            state = next_state
+            episode_return += reward
+        print(f"episode = {episode}, episode_return = {episode_return}")
+        return_list.append(episode_return)
+        agent.update(transition)
+    env.close()
     return return_list
 
 
@@ -114,8 +132,8 @@ def train_off_policy_agent(env, agent, params: HyperParameters, is_render=False,
             episode_return += reward
             # 当buffer数据的数量超过一定值后,才进行Q网络训练
             if replay_buffer.size() > params.minimal_size:
-                b_states, b_actions, b_rewards, b_next_states, b_dones = replay_buffer.sample(params.batch_size)
-                agent.update(b_states, b_actions, b_rewards, b_next_states, b_dones)
+                transition = replay_buffer.sample(params.batch_size)
+                agent.update(transition)
         print(f"episode = {episode}, episode_return = {episode_return}")
         return_list.append(episode_return)
     # 最后一次的 env.render() 没有关闭，所以在这里关闭一下。
