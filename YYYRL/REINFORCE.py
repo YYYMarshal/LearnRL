@@ -2,9 +2,8 @@ import gym
 import torch
 import torch.nn.functional as fun
 import numpy as np
-import matplotlib.pyplot as plt
 import datetime
-from YYYRL.utility import HyperParameters, train_on_policy_agent, moving_average, OnPolicyTransition
+from YYYRL.utility import HyperParameters, train_on_policy_agent, moving_average, OnPolicyTransition, plot
 
 
 class PolicyNet(torch.nn.Module):
@@ -49,16 +48,20 @@ class REINFORCE:
 
 def main():
     print(datetime.datetime.now())
+
     params = HyperParameters()
     params.num_episodes = 1000
     params.lr = 1e-3
+
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     print(f"device.type = {device.type}, device = {device}")
 
     env_name = "CartPole-v0"
     env = gym.make(env_name)
-    env.seed(0)
-    torch.manual_seed(0)
+
+    env.seed(params.num_seed)
+    torch.manual_seed(params.num_seed)
+
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.n
     agent = REINFORCE(state_dim, action_dim, device, params)
@@ -67,19 +70,15 @@ def main():
 
     print(datetime.datetime.now())
 
+    xlabel = "Episodes"
+    ylabel = "Returns"
+    title = f"REINFORCE on {env_name}"
+
     episodes_list = list(range(len(return_list)))
-    plt.plot(episodes_list, return_list)
-    plt.xlabel('Episodes')
-    plt.ylabel('Returns')
-    plt.title('REINFORCE on {}'.format(env_name))
-    plt.show()
+    plot(episodes_list, return_list, xlabel, ylabel, title)
 
     mv_return = moving_average(return_list, 9)
-    plt.plot(episodes_list, mv_return)
-    plt.xlabel('Episodes')
-    plt.ylabel('Returns')
-    plt.title('REINFORCE on {}'.format(env_name))
-    plt.show()
+    plot(episodes_list, mv_return, xlabel, ylabel, title)
 
 
 if __name__ == '__main__':
