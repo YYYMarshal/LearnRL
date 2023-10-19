@@ -136,7 +136,7 @@ def main():
     batch_size = 64
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
-    env_name = 'Pendulum-v0'
+    env_name = "Pendulum-v0"
     env = gym.make(env_name)
     state_dim = env.observation_space.shape[0]
     action_dim = 11  # 将连续动作分成11个离散动作
@@ -151,6 +151,9 @@ def main():
             state_dim, hidden_dim, action_dim, lr, gamma, epsilon, target_update, device)
         return_list, max_q_value_list = train_dqn(
             agent, env, num_episodes, replay_buffer, minimal_size, batch_size)
+
+        print("---------------------")
+        print(f"mean_DQN = {np.mean(return_list)}")
 
         episodes_list = list(range(len(return_list)))
         mv_return = rl_utils.moving_average(return_list, 5)
@@ -180,6 +183,9 @@ def main():
         return_list, max_q_value_list = train_dqn(
             agent, env, num_episodes, replay_buffer, minimal_size, batch_size)
 
+        print("---------------------")
+        print(f"mean_DoubleDQN = {np.mean(return_list)}")
+
         episodes_list = list(range(len(return_list)))
         mv_return = rl_utils.moving_average(return_list, 5)
         plt.plot(episodes_list, mv_return)
@@ -197,8 +203,8 @@ def main():
         plt.title('Double DQN on {}'.format(env_name))
         plt.show()
 
-    # main_dqn()
-    main_double_dqn()
+    main_dqn()
+    # main_double_dqn()
 
 
 if __name__ == '__main__':
