@@ -6,11 +6,11 @@ import torch
 
 
 class OffPolicyTransition:
-    def __init__(self, states, actions, next_actions, rewards, dones):
+    def __init__(self, states, actions, rewards, next_states, dones):
         self.states = states
         self.actions = actions
-        self.next_states = next_actions
         self.rewards = rewards
+        self.next_states = next_states
         self.dones = dones
 
 
@@ -31,7 +31,12 @@ class ReplayBuffer:
     def sample(self, batch_size):
         transitions = random.sample(self.buffer, batch_size)
         states, actions, rewards, next_states, dones = zip(*transitions)
-        transition = OffPolicyTransition(np.array(states), actions, rewards, np.array(next_states), dones)
+        transition = OffPolicyTransition(
+            states=np.array(states),
+            actions=actions,
+            rewards=rewards,
+            next_states=np.array(next_states),
+            dones=dones)
         return transition
 
     # 目前buffer中数据的数量

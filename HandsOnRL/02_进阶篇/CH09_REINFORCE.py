@@ -100,6 +100,7 @@ def main():
                     })
                 pbar.update(1)
 
+    print(f"mean_REINFORCE = {np.mean(return_list)}")
     episodes_list = list(range(len(return_list)))
     plt.plot(episodes_list, return_list)
     plt.xlabel('Episodes')

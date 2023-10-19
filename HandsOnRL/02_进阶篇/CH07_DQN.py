@@ -149,6 +149,7 @@ def main():
                 pbar.update(1)
 
     print("---------------------")
+    print(f"mean_DQN = {np.mean(return_list)}")
     episodes_list = list(range(len(return_list)))
     # episodes_list = np.arange(1, len(return_list) + 1)
     plt.plot(episodes_list, return_list)

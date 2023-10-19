@@ -47,7 +47,7 @@ class REINFORCE:
 
 
 def main():
-    print(datetime.datetime.now())
+    print(f"Time: {datetime.datetime.now()}")
 
     params = HyperParameters()
     params.num_episodes = 1000
@@ -68,7 +68,9 @@ def main():
 
     return_list = train_on_policy_agent(env, agent, params)
 
-    print(datetime.datetime.now())
+    print("---------------------")
+    print(f"Time: {datetime.datetime.now()}")
+    print(f"mean_REINFORCE = {np.mean(return_list)}")
 
     xlabel = "Episodes"
     ylabel = "Returns"
