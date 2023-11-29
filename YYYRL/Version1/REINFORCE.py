@@ -3,7 +3,7 @@ import torch
 import torch.nn.functional as fun
 import numpy as np
 import datetime
-from YYYRL.utility import HyperParameters, train_on_policy_agent, moving_average, OnPolicyTransition, plot
+from YYYRL.Version1.utility import HyperParameters, train_on_policy_agent, moving_average, OnPolicyTransition, plot
 
 
 class PolicyNet(torch.nn.Module):
