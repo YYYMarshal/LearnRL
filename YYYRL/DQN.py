@@ -101,40 +101,8 @@ def train(env_name: str):
     agent = DQN(state_dim, hidden_dim, action_dim, lr,
                 gamma, epsilon, target_update, device)
     replay_buffer = utility.ReplayBuffer(buffer_size)
-    return_list = []
-
-    for i_episode in range(num_episodes):
-        episode_return = 0
-        state = env.reset()
-        done = False
-        while not done:
-            # if i_episode % 10 == 0:
-            #     env.render()
-            action = agent.take_action(state)
-            next_state, reward, done, info = env.step(action)
-            replay_buffer.add(state, action, reward, next_state, done)
-            state = next_state
-            episode_return += reward
-            # 当buffer数据的数量超过一定值后,才进行Q网络训练
-            if replay_buffer.size() > minimal_size:
-                b_s, b_a, b_r, b_ns, b_d = replay_buffer.sample(batch_size)
-                transition_dict = {
-                    'states': b_s,
-                    'actions': b_a,
-                    'rewards': b_r,
-                    'next_states': b_ns,
-                    'dones': b_d
-                }
-                agent.update(transition_dict)
-        return_list.append(episode_return)
-        # 每运行 1/10 num_episodes 次打印一次信息
-        part = num_episodes / 10
-        if i_episode % part == 0:
-            print(f"{i_episode}/{num_episodes}, episode_return = {episode_return}")
-        # env.close()
-
-    print("---------------------")
-    print(f"mean_DQN = {np.mean(return_list)}")
+    return_list = utility.train_off_policy_agent(env, agent, num_episodes, replay_buffer,
+                                                 minimal_size, batch_size, True)
     return return_list
 
 
