@@ -74,8 +74,8 @@ class DQN:
 
 def train(env_name: str):
     lr = 2e-3
-    num_episodes = 200
-    # 当 hidden_dim = 128 时：mean_DQN = 141
+    num_episodes = 500
+    # 当 hidden_dim = 128 时：mean_DQN = 141.316
     # 当 hidden_dim = 512 时：mean_DQN = 153.216
     hidden_dim = 128
     gamma = 0.98
@@ -127,8 +127,10 @@ def train(env_name: str):
                 }
                 agent.update(transition_dict)
         return_list.append(episode_return)
-        if i_episode % 10 == 0:
-            print(f"i_episode {i_episode}, episode_return = {episode_return}")
+        # 每运行 1/10 num_episodes 次打印一次信息
+        part = num_episodes / 10
+        if i_episode % part == 0:
+            print(f"{i_episode}/{num_episodes}, episode_return = {episode_return}")
         # env.close()
 
     print("---------------------")
