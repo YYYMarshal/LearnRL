@@ -2,7 +2,7 @@ import random
 import gym
 import numpy as np
 import torch
-import torch.nn.functional as func
+import torch.nn.functional as F
 import utility
 import matplotlib.pyplot as plt
 
@@ -20,7 +20,7 @@ class QNet(torch.nn.Module):
         """
         定义了前向传播方法，用于定义模型的正向计算
         """
-        x = func.relu(self.fc1(x))  # 隐藏层使用ReLU激活函数
+        x = F.relu(self.fc1(x))  # 隐藏层使用ReLU激活函数
         return self.fc2(x)
 
 
@@ -36,8 +36,8 @@ class VANet(torch.nn.Module):
         self.fc_V = torch.nn.Linear(hidden_dim, 1)
 
     def forward(self, x):
-        value_a = self.fc_A(func.relu(self.fc1(x)))
-        value_v = self.fc_V(func.relu(self.fc1(x)))
+        value_a = self.fc_A(F.relu(self.fc1(x)))
+        value_v = self.fc_V(F.relu(self.fc1(x)))
         # Q值由V值和A值计算得到
         value_q = value_v + value_a - value_a.mean(1).view(-1, 1)
         return value_q
@@ -99,7 +99,7 @@ class DQN:
             """ DQN的情况 """
             max_next_q_values = self.target_q_net(next_states).max(1)[0].view(-1, 1)
         q_targets = rewards + self.gamma * max_next_q_values * (1 - dones)  # TD误差目标
-        dqn_loss = torch.mean(func.mse_loss(q_values, q_targets))  # 均方误差损失函数
+        dqn_loss = torch.mean(F.mse_loss(q_values, q_targets))  # 均方误差损失函数
         self.optimizer.zero_grad()  # PyTorch中默认梯度会累积,这里需要显式将梯度置为0
         dqn_loss.backward()  # 反向传播更新参数
         self.optimizer.step()

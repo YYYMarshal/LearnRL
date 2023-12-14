@@ -180,4 +180,33 @@ pip install IPython
 pip install swig
 pip install gym[box2d]
 ```
+# MSRL
+More Simple Reinforcement Learning
+## 链接
+
+【更简单的强化学习,代码实战】 https://www.bilibili.com/video/BV1X94y1Y7hS/
+
+GitHub: https://github.com/lansinuote/More_Simple_Reinforcement_Learning/tree/main
+
+## 环境配置
+
+> python==3.9
+>
+> pytorch==1.12.1(cpu)
+>
+> gym==0.26.2
+>
+> pettingzoo==1.23.1
+
+```cmd
+conda create -n MSRL python=3.9
+conda activate MSRL
+pip install gym==0.26.2
+pip install pettingzoo==1.23.1
+pip install S:\PyTorch_whl\torch-1.12.1+cu113-cp39-cp39-win_amd64.whl
+pip install matplotlib # 3.8.2
+pip install pygame # 2.5.2
+pip install IPython # 8.18.1
+```
+
 
