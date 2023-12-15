@@ -124,6 +124,11 @@ def train(pool, env, q_table):
 
             """ -------------- """
             # 求下一个动作,和Q学习唯一的区别点
+            """
+            up 这里有问题，应该用 epsilon-Greedy 之类的选择动作的策略，
+            如果按照下面的做法，就跟他之前的 Qlearning 算法没区别了，
+            都是在选择 next_action 的时候，采用了取 next_state 下 Q 表的最大值的策略。
+            """
             next_action = q_table[next_state].argmax()
             # 实际玩了之后得到的reward + 下一个状态的价值 * gamma
             target = reward + q_table[next_state, next_action] * gamma
