@@ -84,8 +84,8 @@ def main():
                     next_state, reward, done, _ = env.step(action)
                     transition_dict['states'].append(state)
                     transition_dict['actions'].append(action)
-                    transition_dict['next_states'].append(next_state)
                     transition_dict['rewards'].append(reward)
+                    transition_dict['next_states'].append(next_state)
                     transition_dict['dones'].append(done)
                     state = next_state
                     episode_return += reward
