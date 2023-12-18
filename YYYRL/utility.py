@@ -1,4 +1,3 @@
-from tqdm import tqdm
 import numpy as np
 import torch
 import collections
@@ -37,7 +36,7 @@ def moving_average(a, window_size):
 def plot(return_list: [], algorithm: str, env_name: str):
     episodes_list = list(range(len(return_list)))
     xlabel = "Episodes"
-    ylabel = "Returns"
+    ylabel = "Episode Reward"
     title = f"{algorithm} on {env_name}"
     plt.plot(episodes_list, return_list)
     plt.xlabel(xlabel)
@@ -58,7 +57,7 @@ def train_on_policy_agent(env, agent, num_episodes, is_render=False, interval=10
     # 每运行 num_episodes * (1/interval) 次打印一次信息、显示画面（可选）
     part = num_episodes / interval
     for i_episode in range(num_episodes):
-        episode_return = 0
+        episode_reward = 0
         state = env.reset()
         done = False
         is_print = i_episode % part == 0
@@ -74,14 +73,14 @@ def train_on_policy_agent(env, agent, num_episodes, is_render=False, interval=10
             transition_dict['next_states'].append(next_state)
             transition_dict['dones'].append(done)
             state = next_state
-            episode_return += reward
-        return_list.append(episode_return)
+            episode_reward += reward
+        return_list.append(episode_reward)
         agent.update(transition_dict)
         if is_print:
-            print(f"{i_episode}/{num_episodes}, episode_return = {episode_return}")
+            print(f"{i_episode}/{num_episodes}, episode_reward = {episode_reward}")
 
     print("---------------------")
-    print(f"回报的平均值 = {np.mean(return_list)}")
+    print(f"Reward 的平均值 = {np.mean(return_list)}")
     return return_list
 
 
@@ -92,7 +91,7 @@ def train_off_policy_agent(env, agent, num_episodes,
     # 每运行 num_episodes * (1/interval) 次打印一次信息、显示画面（可选）
     part = num_episodes / interval
     for i_episode in range(num_episodes):
-        episode_return = 0
+        episode_reward = 0
         state = env.reset()
         done = False
         is_print = i_episode % part == 0
@@ -103,7 +102,7 @@ def train_off_policy_agent(env, agent, num_episodes,
             next_state, reward, done, info = env.step(action)
             replay_buffer.add(state, action, reward, next_state, done)
             state = next_state
-            episode_return += reward
+            episode_reward += reward
             # 当buffer数据的数量超过一定值后,才进行Q网络训练
             if replay_buffer.size() > minimal_size:
                 b_s, b_a, b_r, b_ns, b_d = replay_buffer.sample(batch_size)
@@ -114,13 +113,13 @@ def train_off_policy_agent(env, agent, num_episodes,
                     'next_states': b_ns,
                     'dones': b_d}
                 agent.update(transition_dict)
-        return_list.append(episode_return)
+        return_list.append(episode_reward)
         env.close()
         if is_print:
-            print(f"{i_episode}/{num_episodes}, episode_return = {episode_return}")
+            print(f"{i_episode}/{num_episodes}, episode_reward = {episode_reward}")
 
     print("---------------------")
-    print(f"回报的平均值 = {np.mean(return_list)}")
+    print(f"Reward 的平均值 = {np.mean(return_list)}")
     return return_list
 
 

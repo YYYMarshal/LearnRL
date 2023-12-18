@@ -28,7 +28,7 @@ class VANet(torch.nn.Module):
 
     def __init__(self, state_dim, hidden_dim, action_dim):
         """
-        只有一层隐藏层的A网络和V网络
+        只有一层隐藏层的 A网络 和 V网络
         """
         super(VANet, self).__init__()
         self.fc1 = torch.nn.Linear(state_dim, hidden_dim)  # 共享网络部分
@@ -38,7 +38,7 @@ class VANet(torch.nn.Module):
     def forward(self, x):
         value_a = self.fc_A(F.relu(self.fc1(x)))
         value_v = self.fc_V(F.relu(self.fc1(x)))
-        # Q值由V值和A值计算得到
+        # Q值 由 V值 和 A值 计算得到
         value_q = value_v + value_a - value_a.mean(1).view(-1, 1)
         return value_q
 
@@ -48,7 +48,7 @@ class DQN:
                  gamma, epsilon, target_update, device, dqn_type="DQN"):
         self.action_dim = action_dim
         if dqn_type == 'DuelingDQN':
-            """ Dueling DQN采取不一样的网络框架 """
+            """ Dueling DQN 采取不一样的网络框架 """
             self.q_net = VANet(state_dim, hidden_dim, self.action_dim).to(device)
             self.target_q_net = VANet(state_dim, hidden_dim, self.action_dim).to(device)
         else:
@@ -211,7 +211,7 @@ def main_all_dqn():
 
 
 if __name__ == '__main__':
-    # main_single_dqn("DQN")
+    # main_single_dqn("DQN") # Reward 的平均值 = 141.316
     # main_single_dqn("DoubleDQN")
     # main_single_dqn("DuelingDQN")
     main_all_dqn()
