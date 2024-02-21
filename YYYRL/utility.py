@@ -53,10 +53,12 @@ def plot(return_list: [], algorithm: str, env_name: str):
 
 
 def train_on_policy_agent(env, agent, num_episodes, is_render=False, interval=10):
-    return_list = []
+    # num_episodes 次 Episode 的 Reward 的列表集合
+    episode_reward_list = []
     # 每运行 num_episodes * (1/interval) 次打印一次信息、显示画面（可选）
     part = num_episodes / interval
     for i_episode in range(num_episodes):
+        # 每一个 Episode 的总 Reward
         episode_reward = 0
         state = env.reset()
         done = False
@@ -74,21 +76,20 @@ def train_on_policy_agent(env, agent, num_episodes, is_render=False, interval=10
             transition_dict['dones'].append(done)
             state = next_state
             episode_reward += reward
-        return_list.append(episode_reward)
+        episode_reward_list.append(episode_reward)
         agent.update(transition_dict)
         if is_print:
             print(f"{i_episode}/{num_episodes}, episode_reward = {episode_reward}")
 
     print("---------------------")
-    print(f"Reward 的平均值 = {np.mean(return_list)}")
-    return return_list
+    print(f"Episode Reward List 的平均值 = {np.mean(episode_reward_list)}")
+    return episode_reward_list
 
 
 def train_off_policy_agent(env, agent, num_episodes,
                            replay_buffer, minimal_size, batch_size,
                            is_render=False, interval=10):
-    return_list = []
-    # 每运行 num_episodes * (1/interval) 次打印一次信息、显示画面（可选）
+    episode_reward_list = []
     part = num_episodes / interval
     for i_episode in range(num_episodes):
         episode_reward = 0
@@ -113,14 +114,14 @@ def train_off_policy_agent(env, agent, num_episodes,
                     'next_states': b_ns,
                     'dones': b_d}
                 agent.update(transition_dict)
-        return_list.append(episode_reward)
+        episode_reward_list.append(episode_reward)
         env.close()
         if is_print:
             print(f"{i_episode}/{num_episodes}, episode_reward = {episode_reward}")
 
     print("---------------------")
-    print(f"Reward 的平均值 = {np.mean(return_list)}")
-    return return_list
+    print(f"Episode Reward List 的平均值 = {np.mean(episode_reward_list)}")
+    return episode_reward_list
 
 
 def compute_advantage(gamma, lmbda, td_delta):

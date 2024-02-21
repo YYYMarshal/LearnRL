@@ -3,7 +3,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 # import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import utility
 
 
@@ -52,6 +52,7 @@ class ActorCritic:
         self.device = device
 
     def take_action(self, state):
+        # 与 REINFORCE 算法一样，self.actor 也是 PolicyNet
         state = torch.tensor(np.array([state]), dtype=torch.float).to(self.device)
         probs = self.actor(state)
         action_dist = torch.distributions.Categorical(probs)
