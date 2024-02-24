@@ -31,7 +31,8 @@ def test():
     desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
     print(desktop_path)
     img_path = os.path.join(
-        desktop_path, r"hymenoptera_data\train\ants\0013035.jpg")
+        # desktop_path, r"hymenoptera_data\train\ants\0013035.jpg")
+        desktop_path, r"hymenoptera_data\train\ants_image\0013035.jpg")
     print(img_path)
     img = Image.open(img_path)
     print(img.size)
@@ -42,10 +43,12 @@ def main():
     desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
     root_dir = os.path.join(desktop_path, r"hymenoptera_data\train")
 
-    ants_label_dir = r"ants"
+    # ants_label_dir = r"ants"
+    ants_label_dir = r"ants_image"
     ants_dataset = MyData(root_dir, ants_label_dir)
 
-    bees_label_dir = r"bees"
+    # bees_label_dir = r"bees"
+    bees_label_dir = r"bees_image"
     bees_dataset = MyData(root_dir, bees_label_dir)
 
     train_dataset = ants_dataset + bees_dataset
