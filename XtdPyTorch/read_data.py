@@ -4,6 +4,10 @@ import os
 
 """
 这个代码文件运行的时候，需要将 hymenoptera_data 文件夹放到桌面
+
+2024-3-2 15:34:18：
+将 hymenoptera_data 文件夹放进了 "项目目录/XtdPyTorch" 中，并添加进了 .gitignore 中，
+所以如果采用了后者的方式，该代码文件中的部分代码需要做相应的修改。
 """
 
 
