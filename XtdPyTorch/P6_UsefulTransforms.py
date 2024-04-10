@@ -41,7 +41,6 @@ img_resize_tensor = trans_totensor(img_resize)
 writer.add_image("Resize", img_resize_tensor, 0)
 
 """ Compose Resize 2 """
-# 这不是改变大小，这是改变像素值，控制清晰度的
 print("=== Compose Resize 2 ===")
 trans_resize_2 = transforms.Resize(512)
 trans_compose = transforms.Compose([trans_resize_2, trans_totensor])
