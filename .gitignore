@@ -1,4 +1,8 @@
 .idea
 __pycache__
+
 XtdPyTorch/hymenoptera_data
 XtdPyTorch/logs
+XtdPyTorch/dataset
+XtdPyTorch/dataset_transforms
+XtdPyTorch/DataLoader
