@@ -6,3 +6,4 @@ XtdPyTorch/logs
 XtdPyTorch/dataset
 XtdPyTorch/dataset_transforms
 XtdPyTorch/DataLoader
+XtdPyTorch/logs_maxpool
