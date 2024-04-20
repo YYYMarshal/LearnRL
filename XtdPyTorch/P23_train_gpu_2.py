@@ -4,6 +4,10 @@ from torch.utils.data import DataLoader
 from torch import nn
 from MyModel import MyModel
 from torch.utils.tensorboard import SummaryWriter
+import time
+
+# device = torch.device("cpu")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 """ 1. 准备数据集 """
 train_data = torchvision.datasets.CIFAR10(
@@ -24,9 +28,11 @@ test_dataloader = DataLoader(test_data, batch_size=64)
 
 """ 3. 搭建神经网络 """
 model = MyModel()
+model = model.to(device)
 
 """ 4. 创建损失函数 """
 loss_fn = nn.CrossEntropyLoss()
+loss_fn = loss_fn.to(device)
 
 """ 5. 优化器 """
 # 1e-2 = 1 * (10)^(-2) = 0.01
@@ -42,6 +48,7 @@ total_test_step = 0
 epoch = 10
 
 writer = SummaryWriter("logs")
+start_time = time.time()
 
 for i in range(epoch):
     print(f"------ 第 {i + 1} 轮训练开始 ------")
@@ -50,6 +57,8 @@ for i in range(epoch):
     model.train()
     for data in train_dataloader:
         imgs, targets = data
+        imgs = imgs.to(device)
+        targets = targets.to(device)
         outputs = model(imgs)
         loss = loss_fn(outputs, targets)
 
@@ -60,6 +69,8 @@ for i in range(epoch):
 
         total_train_step += 1
         if total_train_step % 100 == 0:
+            end_time = time.time()
+            print(end_time - start_time)
             # loss, loss.item(): item方法就是tensor取值
             print(f"训练次数：{total_train_step}, Loss = {loss}")
             writer.add_scalar("train_loss", loss.item(), total_train_step)
@@ -71,6 +82,8 @@ for i in range(epoch):
     with torch.no_grad():
         for data in test_dataloader:
             imgs, targets = data
+            imgs = imgs.to(device)
+            targets = targets.to(device)
             outputs = model(imgs)
             loss = loss_fn(outputs, targets)
             total_test_loss += loss.item()
