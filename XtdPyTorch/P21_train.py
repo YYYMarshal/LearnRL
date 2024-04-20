@@ -3,6 +3,7 @@ import torchvision
 from torch.utils.data import DataLoader
 from torch import nn
 from MyModel import MyModel
+from torch.utils.tensorboard import SummaryWriter
 
 """ 1. 准备数据集 """
 train_data = torchvision.datasets.CIFAR10(
@@ -40,10 +41,13 @@ total_test_step = 0
 # 训练的轮数
 epoch = 10
 
+writer = SummaryWriter("logs")
+
 for i in range(epoch):
     print(f"------ 第 {i + 1} 轮训练开始 ------")
 
     # 训练步骤开始
+    model.train()
     for data in train_dataloader:
         imgs, targets = data
         outputs = model(imgs)
@@ -55,5 +59,35 @@ for i in range(epoch):
         optimizer.step()
 
         total_train_step += 1
-        # loss, loss.item(): item方法就是tensor取值
-        print(f"训练次数：{total_train_step}, Loss = {loss}")
+        if total_train_step % 100 == 0:
+            # loss, loss.item(): item方法就是tensor取值
+            print(f"训练次数：{total_train_step}, Loss = {loss}")
+            writer.add_scalar("train_loss", loss.item(), total_train_step)
+
+    # 测试步骤开始
+    model.eval()
+    total_test_loss = 0
+    total_accuracy = 0
+    with torch.no_grad():
+        for data in test_dataloader:
+            imgs, targets = data
+            outputs = model(imgs)
+            loss = loss_fn(outputs, targets)
+            total_test_loss += loss.item()
+
+            # argmax(1), 横向就是，单张图片的各种类别概率，求最大
+            accuracy = (outputs.argmax(1) == torch.tensor(targets)).sum()
+            total_accuracy += accuracy
+
+    print(f"整体测试集上的 Loss: {total_test_loss}")
+    print(f"整体测试集上的正确率: {total_accuracy / test_data_size}")
+    writer.add_scalar("test_loss", total_test_loss, total_test_step)
+    writer.add_scalar("test_accuracy",
+                      total_accuracy / test_data_size, total_test_step)
+    total_test_step += 1
+
+    torch.save(model, f"models/model {i}")
+    # torch.save(model.state_dict(), f"models/model {i}")
+    print("模型已保存")
+
+writer.close()
