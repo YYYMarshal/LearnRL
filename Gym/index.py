@@ -121,9 +121,25 @@ def playing_mountain_car():
     # play(env)
 
 
+def env_info():
+    # env_name = "Acrobot-v1"
+    env_name = "CartPole-v1"
+    # env_name = "MountainCarContinuous-v0"
+    env = gym.make(env_name)
+    print(env.observation_space.shape, env.action_space)
+    state_dim = env.observation_space.shape[0]
+    # 连续动作空间的环境不能使用下面的 .n
+    action_dim = env.action_space.n
+    state_high_bound = env.observation_space.high
+    state_low_bound = env.observation_space.low
+    print(state_dim, action_dim)
+    print(state_high_bound)
+    print(state_low_bound)
+
+
 def main():
     # play_game("LunarLander-v2", 10)
-    play_game("Adventure-v4", 10)
+    # play_game("Adventure-v4", 10)
     # interacting_with_the_environment()
     # checking_api_conformity()
     # spaces()
@@ -134,6 +150,7 @@ def main():
     # playing_car_racing()
     # playing_ms_pacman()
     # playing_mountain_car()
+    env_info()
 
 
 if __name__ == '__main__':
