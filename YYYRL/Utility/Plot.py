@@ -12,11 +12,11 @@ def moving_average(a, window_size):
 
 
 def plot(return_list: [], algorithm: str, env_name: str, is_plot_average=False):
-    episodes_list = list(range(len(return_list)))
-    xlabel = "Episodes"
+    episode_list = list(range(len(return_list)))
+    xlabel = "Episode"
     ylabel = "Episode Reward"
     title = f"{algorithm} on {env_name}"
-    plt.plot(episodes_list, return_list)
+    plt.plot(episode_list, return_list)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
@@ -26,7 +26,7 @@ def plot(return_list: [], algorithm: str, env_name: str, is_plot_average=False):
         return
 
     mv_return = moving_average(return_list, 9)
-    plt.plot(episodes_list, mv_return)
+    plt.plot(episode_list, mv_return)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)

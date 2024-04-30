@@ -52,9 +52,10 @@ def main():
     agent = Qlearning(state_dim, action_dim, epsilon, alpha, gamma)
     # print(agent.Q_table)
 
-    all_episode_reward_list = []  # 记录每一条序列的总奖励
+    # 记录所有 Episode 的总奖励
+    episode_reward_list = []
     for episode in range(num_episodes):
-        episode_reward_list = 0
+        episode_reward = 0
         state = env.reset()
         done = False
         while not done:
@@ -62,18 +63,19 @@ def main():
             # env.render()
             action = agent.take_action(state)
             next_state, reward, done, info = env.step(action)
-            episode_reward_list += reward
+            # reward 是单步动作的奖励，episode_reward 是这一个 Episode 的总奖励
+            episode_reward += reward
             agent.update(state, action, reward, next_state)
             state = next_state
-        # print(episode_reward_list)
-        all_episode_reward_list.append(episode_reward_list)
+        # print(episode_reward)
+        episode_reward_list.append(episode_reward)
 
     # print(agent.Q_table)
     # CliffWalking-v0: 4, 12
     agent.show_result(4, 4)
     # 35417
-    print(f"总奖励 = {np.sum(all_episode_reward_list)}")
-    plot(all_episode_reward_list, "Qlearning", "FrozonLake-v0", is_plot_average=True)
+    print(f"总奖励 = {np.sum(episode_reward_list)}")
+    plot(episode_reward_list, "Qlearning", "FrozonLake-v0", is_plot_average=True)
 
 
 if __name__ == "__main__":
