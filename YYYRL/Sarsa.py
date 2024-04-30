@@ -100,7 +100,7 @@ def main():
     plt.plot(episodes_list, return_list)
     plt.xlabel('Episodes')
     plt.ylabel('Returns')
-    plt.title('Sarsa on {}'.format('Cliff Walking'))
+    plt.title('Sarsa on {}'.format('FrozenLake-v0'))
     plt.show()
 
 
