@@ -47,7 +47,7 @@ class DQN:
     def __init__(self, state_dim, hidden_dim, action_dim, learning_rate,
                  gamma, epsilon, target_update, device, dqn_type="DQN"):
         self.action_dim = action_dim
-        if dqn_type == 'DuelingDQN':
+        if dqn_type == "DuelingDQN":
             """ Dueling DQN 采取不一样的网络框架 """
             self.q_net = VANet(state_dim, hidden_dim, self.action_dim).to(device)
             self.target_q_net = VANet(state_dim, hidden_dim, self.action_dim).to(device)
@@ -91,8 +91,8 @@ class DQN:
 
         q_values = self.q_net(states).gather(1, actions)  # Q值
         # 下个状态的最大Q值
-        if self.dqn_type == 'DoubleDQN':
-            """ DQN与Double DQN的区别 """
+        if self.dqn_type == "DoubleDQN":
+            """ DQN 与 Double DQN 的区别 """
             max_action = self.q_net(next_states).max(1)[1].view(-1, 1)
             max_next_q_values = self.target_q_net(next_states).gather(1, max_action)
         else:
