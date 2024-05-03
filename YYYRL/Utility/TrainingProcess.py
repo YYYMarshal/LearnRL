@@ -1,18 +1,32 @@
 import numpy as np
 
 
-def train_on_policy_agent(env, agent, num_episodes, is_render=False, interval=10):
+def train_on_policy_agent(env, agent, num_episodes,
+                          is_render=False, interval=10):
     # num_episodes 次 Episode 的 Reward 的列表集合
+    # 记录所有 Episode 的总奖励
     episode_reward_list = []
     # 每运行 num_episodes * (1/interval) 次打印一次信息、显示画面（可选）
     part = num_episodes / interval
-    for i_episode in range(num_episodes):
-        # 每一个 Episode 的总 Reward
+    for episode in range(num_episodes):
+        # 每一个 Episode 的 总Reward
         episode_reward = 0
         state = env.reset()
         done = False
-        is_print = i_episode % part == 0
-        transition_dict = {'states': [], 'actions': [], 'rewards': [], 'next_states': [], 'dones': []}
+        is_print = episode % part == 0
+        """
+        on-policy 的 transition_dict 的每个元素的值是列表，
+        off-policy 的 transition_dict 的每个元素的值则是单变量。
+        但是它们两个的值都包含了多个变量，比如 键"states" 的值，
+        在 on-policy 中包含了一整个 Episode 的 state，
+        在 off-policy 中包含了 batch_size 个 state。
+        """
+        transition_dict = {
+            "states": [],
+            "actions": [],
+            "rewards": [],
+            "next_states": [],
+            "dones": []}
         while not done:
             if is_render and is_print:
                 env.render()
@@ -26,9 +40,13 @@ def train_on_policy_agent(env, agent, num_episodes, is_render=False, interval=10
             state = next_state
             episode_reward += reward
         episode_reward_list.append(episode_reward)
+        """
+        on-policy 每过一个 Episode 才会执行 update，
+        off-policy 则是当buffer数据的数量超过一定值后，才进行Q网络训练。
+        """
         agent.update(transition_dict)
         if is_print:
-            print(f"{i_episode}/{num_episodes}, episode_reward = {episode_reward}")
+            print(f"{episode}/{num_episodes}, episode_reward = {episode_reward}")
 
     print("---------------------")
     print(f"Episode Reward List 的平均值 = {np.mean(episode_reward_list)}")
@@ -40,11 +58,11 @@ def train_off_policy_agent(env, agent, num_episodes,
                            is_render=False, interval=10):
     episode_reward_list = []
     part = num_episodes / interval
-    for i_episode in range(num_episodes):
+    for episode in range(num_episodes):
         episode_reward = 0
         state = env.reset()
         done = False
-        is_print = i_episode % part == 0
+        is_print = episode % part == 0
         while not done:
             if is_render and is_print:
                 env.render()
@@ -53,20 +71,21 @@ def train_off_policy_agent(env, agent, num_episodes,
             replay_buffer.add(state, action, reward, next_state, done)
             state = next_state
             episode_reward += reward
-            # 当buffer数据的数量超过一定值后,才进行Q网络训练
+            # 当buffer数据的数量超过一定值后，才进行Q网络训练
             if replay_buffer.size() > minimal_size:
                 b_s, b_a, b_r, b_ns, b_d = replay_buffer.sample(batch_size)
                 transition_dict = {
-                    'states': b_s,
-                    'actions': b_a,
-                    'rewards': b_r,
-                    'next_states': b_ns,
-                    'dones': b_d}
+                    "states": b_s,
+                    "actions": b_a,
+                    "rewards": b_r,
+                    "next_states": b_ns,
+                    "dones": b_d}
                 agent.update(transition_dict)
+
         episode_reward_list.append(episode_reward)
         env.close()
         if is_print:
-            print(f"{i_episode}/{num_episodes}, episode_reward = {episode_reward}")
+            print(f"{episode}/{num_episodes}, episode_reward = {episode_reward}")
 
     print("---------------------")
     print(f"Episode Reward List 的平均值 = {np.mean(episode_reward_list)}")

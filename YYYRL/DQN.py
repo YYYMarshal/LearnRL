@@ -5,6 +5,9 @@ import torch
 import torch.nn.functional as F
 import utility
 import matplotlib.pyplot as plt
+from Utility.ReplayBuffer import ReplayBuffer
+from Utility.TrainingProcess import train_off_policy_agent
+from Utility.Plot import plot, moving_average
 
 
 class QNet(torch.nn.Module):
@@ -137,35 +140,36 @@ def train(env_name: str, dqn_type: str):
 
     agent = DQN(state_dim, hidden_dim, action_dim, lr,
                 gamma, epsilon, target_update, device, dqn_type=dqn_type)
-    replay_buffer = utility.ReplayBuffer(buffer_size)
-    return_list = utility.train_off_policy_agent(env, agent, num_episodes, replay_buffer,
-                                                 minimal_size, batch_size, False)
-    return return_list
+    replay_buffer = ReplayBuffer(buffer_size)
+    episode_reward_list = train_off_policy_agent(
+        env, agent, num_episodes,
+        replay_buffer, minimal_size, batch_size)
+    return episode_reward_list
 
 
 def main_single_dqn(dqn_type: str):
     start_time = utility.get_current_time()
     env_name = "CartPole-v0"
-    return_list = train(env_name, dqn_type)
+    episode_reward_list = train(env_name, dqn_type)
     utility.time_difference(start_time)
-    utility.plot(return_list, dqn_type, env_name)
+    plot(episode_reward_list, dqn_type, env_name)
 
 
 def main_all_dqn():
     env_name = "CartPole-v0"
 
     start_time = utility.get_current_time()
-    return_list_dqn = train(env_name, "DQN")
+    episode_reward_list_dqn = train(env_name, "DQN")
     utility.time_difference(start_time)
     print("---------------------")
 
     start_time = utility.get_current_time()
-    return_list_doubledqn = train(env_name, "DoubleDQN")
+    episode_reward_list_doubledqn = train(env_name, "DoubleDQN")
     utility.time_difference(start_time)
     print("---------------------")
 
     start_time = utility.get_current_time()
-    return_list_duelingdqn = train(env_name, "DuelingDQN")
+    episode_reward_list_duelingdqn = train(env_name, "DuelingDQN")
     utility.time_difference(start_time)
     print("---------------------")
 
@@ -173,16 +177,16 @@ def main_all_dqn():
     ylabel = "Returns"
     title = f"DQN/DoubleDQN/DuelingDQN on {env_name}"
 
-    episodes_list_dqn = list(range(len(return_list_dqn)))
-    plt.plot(episodes_list_dqn, return_list_dqn,
+    episodes_list_dqn = list(range(len(episode_reward_list_dqn)))
+    plt.plot(episodes_list_dqn, episode_reward_list_dqn,
              label="DQN", color="blue")
 
-    episodes_list_doubledqn = list(range(len(return_list_doubledqn)))
-    plt.plot(episodes_list_doubledqn, return_list_doubledqn,
+    episodes_list_doubledqn = list(range(len(episode_reward_list_doubledqn)))
+    plt.plot(episodes_list_doubledqn, episode_reward_list_doubledqn,
              label="DoubleDQN", color="red")
 
-    episodes_list_duelingdqn = list(range(len(return_list_duelingdqn)))
-    plt.plot(episodes_list_duelingdqn, return_list_duelingdqn,
+    episodes_list_duelingdqn = list(range(len(episode_reward_list_duelingdqn)))
+    plt.plot(episodes_list_duelingdqn, episode_reward_list_duelingdqn,
              label="DuelingDQN", color="green")
 
     plt.legend()
@@ -191,15 +195,15 @@ def main_all_dqn():
     plt.title(title)
     plt.show()
 
-    mv_return_dqn = utility.moving_average(return_list_dqn, 9)
+    mv_return_dqn = moving_average(episode_reward_list_dqn, 9)
     plt.plot(episodes_list_dqn, mv_return_dqn,
              label="DQN", color="blue")
 
-    mv_return_doubledqn = utility.moving_average(return_list_doubledqn, 9)
+    mv_return_doubledqn = moving_average(episode_reward_list_doubledqn, 9)
     plt.plot(episodes_list_doubledqn, mv_return_doubledqn,
              label="DoubleDQN", color="red")
 
-    mv_return_duelingdqn = utility.moving_average(return_list_duelingdqn, 9)
+    mv_return_duelingdqn = moving_average(episode_reward_list_duelingdqn, 9)
     plt.plot(episodes_list_duelingdqn, mv_return_duelingdqn,
              label="DuelingDQN", color="green")
 
