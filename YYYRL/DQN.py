@@ -81,10 +81,6 @@ class DQN:
             action = self.q_net(state).argmax().item()
         return action
 
-    def max_q_value(self, state):
-        state = torch.tensor([state], dtype=torch.float).to(self.device)
-        return self.q_net(state).max().item()
-
     def update(self, transition_dict):
         states = torch.tensor(transition_dict['states'], dtype=torch.float).to(self.device)
         actions = torch.tensor(transition_dict['actions']).view(-1, 1).to(self.device)
@@ -96,11 +92,17 @@ class DQN:
         # 下个状态的最大Q值
         if self.dqn_type == "DoubleDQN":
             """ DQN 与 Double DQN 的区别 """
+            """
+            也就是选取q_net中n个状态的最大值对应的索引（0或1，因为 action_dim = 2），
+            然后摊平变成n行1列的二维数组的类型，
+            再将获得的索引放入对应的target_q_net的n个状态中，获得对应的q值。
+            """
             max_action = self.q_net(next_states).max(1)[1].view(-1, 1)
             max_next_q_values = self.target_q_net(next_states).gather(1, max_action)
         else:
             """ DQN的情况 """
             max_next_q_values = self.target_q_net(next_states).max(1)[0].view(-1, 1)
+        # 如果 dones 的某个值为 1，也就是代表该 Episode 结束，那么 q_targets = rewards
         q_targets = rewards + self.gamma * max_next_q_values * (1 - dones)  # TD误差目标
         dqn_loss = torch.mean(F.mse_loss(q_values, q_targets))  # 均方误差损失函数
         self.optimizer.zero_grad()  # PyTorch中默认梯度会累积,这里需要显式将梯度置为0
@@ -216,6 +218,6 @@ def main_all_dqn():
 
 if __name__ == '__main__':
     # main_single_dqn("DQN") # Reward 的平均值 = 141.316
-    # main_single_dqn("DoubleDQN")
+    main_single_dqn("DoubleDQN")
     # main_single_dqn("DuelingDQN")
-    main_all_dqn()
+    # main_all_dqn()
