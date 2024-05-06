@@ -2,9 +2,9 @@ import gym
 import numpy as np
 import torch
 import torch.nn.functional as F
-# import numpy as np
-# import matplotlib.pyplot as plt
-import utility
+from Utility.TrainingProcess import train_on_policy_agent
+from Utility.Plot import plot
+from Utility import Timer
 
 
 class PolicyNet(torch.nn.Module):
@@ -100,17 +100,17 @@ def train(env_name: str):
 
     agent = ActorCritic(state_dim, hidden_dim, action_dim, actor_lr, critic_lr, gamma, device)
 
-    return_list = utility.train_on_policy_agent(env, agent, num_episodes)
+    return_list = train_on_policy_agent(env, agent, num_episodes)
     # 回报的平均值 = 146.496
     return return_list
 
 
 def main():
-    start_time = utility.get_current_time()
+    start_time = Timer.get_current_time()
     env_name = "CartPole-v0"
     return_list = train(env_name)
-    utility.time_difference(start_time)
-    utility.plot(return_list, "Actor Critic", env_name)
+    Timer.time_difference(start_time)
+    plot(return_list, "Actor Critic", env_name)
 
 
 if __name__ == "__main__":

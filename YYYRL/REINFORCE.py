@@ -2,7 +2,9 @@ import gym
 import torch
 import torch.nn.functional as F
 import numpy as np
-import utility
+from Utility.TrainingProcess import train_on_policy_agent
+from Utility.Plot import plot
+from Utility import Timer
 
 
 class PolicyNet(torch.nn.Module):
@@ -31,9 +33,9 @@ class REINFORCE:
         return action.item()
 
     def update(self, transition_dict):
-        state_list = transition_dict['states']
-        action_list = transition_dict['actions']
-        reward_list = transition_dict['rewards']
+        state_list = transition_dict["states"]
+        action_list = transition_dict["actions"]
+        reward_list = transition_dict["rewards"]
 
         G = 0
         self.optimizer.zero_grad()
@@ -64,17 +66,17 @@ def train(env_name: str):
           f"env_name = {env_name}, state_dim = {state_dim}, action_dim = {action_dim}")
     agent = REINFORCE(state_dim, hidden_dim, action_dim, learning_rate, gamma, device)
 
-    return_list = utility.train_on_policy_agent(env, agent, num_episodes)
-    # np.mean(return_list) = 141.86
-    return return_list
+    episode_reward_list = train_on_policy_agent(env, agent, num_episodes)
+    # np.mean(episode_reward_list) = 141.86
+    return episode_reward_list
 
 
 def main():
-    start_time = utility.get_current_time()
+    start_time = Timer.get_current_time()
     env_name = "CartPole-v0"
     return_list = train(env_name)
-    utility.time_difference(start_time)
-    utility.plot(return_list, "REINFORCE", env_name)
+    Timer.time_difference(start_time)
+    plot(return_list, "REINFORCE", env_name, True)
 
 
 if __name__ == "__main__":

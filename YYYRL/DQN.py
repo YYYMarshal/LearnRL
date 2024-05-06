@@ -3,11 +3,11 @@ import gym
 import numpy as np
 import torch
 import torch.nn.functional as F
-import utility
 import matplotlib.pyplot as plt
 from Utility.ReplayBuffer import ReplayBuffer
 from Utility.TrainingProcess import train_off_policy_agent
 from Utility.Plot import plot, moving_average
+from Utility import Timer
 
 
 class QNet(torch.nn.Module):
@@ -150,29 +150,29 @@ def train(env_name: str, dqn_type: str):
 
 
 def main_single_dqn(dqn_type: str):
-    start_time = utility.get_current_time()
+    start_time = Timer.get_current_time()
     env_name = "CartPole-v0"
     episode_reward_list = train(env_name, dqn_type)
-    utility.time_difference(start_time)
+    Timer.time_difference(start_time)
     plot(episode_reward_list, dqn_type, env_name)
 
 
 def main_all_dqn():
     env_name = "CartPole-v0"
 
-    start_time = utility.get_current_time()
+    start_time = Timer.get_current_time()
     episode_reward_list_dqn = train(env_name, "DQN")
-    utility.time_difference(start_time)
+    Timer.time_difference(start_time)
     print("---------------------")
 
-    start_time = utility.get_current_time()
+    start_time = Timer.get_current_time()
     episode_reward_list_doubledqn = train(env_name, "DoubleDQN")
-    utility.time_difference(start_time)
+    Timer.time_difference(start_time)
     print("---------------------")
 
-    start_time = utility.get_current_time()
+    start_time = Timer.get_current_time()
     episode_reward_list_duelingdqn = train(env_name, "DuelingDQN")
-    utility.time_difference(start_time)
+    Timer.time_difference(start_time)
     print("---------------------")
 
     xlabel = "Episodes"

@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 
 
 def train_on_policy_agent(env, agent, num_episodes,
@@ -32,11 +33,11 @@ def train_on_policy_agent(env, agent, num_episodes,
                 env.render()
             action = agent.take_action(state)
             next_state, reward, done, info = env.step(action)
-            transition_dict['states'].append(state)
-            transition_dict['actions'].append(action)
-            transition_dict['rewards'].append(reward)
-            transition_dict['next_states'].append(next_state)
-            transition_dict['dones'].append(done)
+            transition_dict["states"].append(state)
+            transition_dict["actions"].append(action)
+            transition_dict["rewards"].append(reward)
+            transition_dict["next_states"].append(next_state)
+            transition_dict["dones"].append(done)
             state = next_state
             episode_reward += reward
         episode_reward_list.append(episode_reward)
@@ -90,3 +91,14 @@ def train_off_policy_agent(env, agent, num_episodes,
     print("---------------------")
     print(f"Episode Reward List 的平均值 = {np.mean(episode_reward_list)}")
     return episode_reward_list
+
+
+def compute_advantage(gamma, lmbda, td_delta):
+    td_delta = td_delta.detach().numpy()
+    advantage_list = []
+    advantage = 0.0
+    for delta in td_delta[::-1]:
+        advantage = gamma * lmbda * advantage + delta
+        advantage_list.append(advantage)
+    advantage_list.reverse()
+    return torch.tensor(advantage_list, dtype=torch.float)
