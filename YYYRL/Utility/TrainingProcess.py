@@ -14,7 +14,7 @@ def train_on_policy_agent(env, agent, num_episodes,
         episode_reward = 0
         state = env.reset()
         done = False
-        is_print = episode % part == 0
+        is_print = (episode + 1) % part == 0
         """
         on-policy 的 transition_dict 的每个元素的值是列表，
         off-policy 的 transition_dict 的每个元素的值则是单变量。
@@ -47,7 +47,7 @@ def train_on_policy_agent(env, agent, num_episodes,
         """
         agent.update(transition_dict)
         if is_print:
-            print(f"{episode}/{num_episodes}, episode_reward = {episode_reward}")
+            print(f"{episode + 1}/{num_episodes}, episode_reward = {episode_reward}")
 
     print("---------------------")
     print(f"Episode Reward List 的平均值 = {np.mean(episode_reward_list)}")
@@ -63,7 +63,7 @@ def train_off_policy_agent(env, agent, num_episodes,
         episode_reward = 0
         state = env.reset()
         done = False
-        is_print = episode % part == 0
+        is_print = (episode + 1) % part == 0
         while not done:
             if is_render and is_print:
                 env.render()
@@ -86,7 +86,7 @@ def train_off_policy_agent(env, agent, num_episodes,
         episode_reward_list.append(episode_reward)
         env.close()
         if is_print:
-            print(f"{episode}/{num_episodes}, episode_reward = {episode_reward}")
+            print(f"{episode + 1}/{num_episodes}, episode_reward = {episode_reward}")
 
     print("---------------------")
     print(f"Episode Reward List 的平均值 = {np.mean(episode_reward_list)}")
