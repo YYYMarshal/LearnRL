@@ -37,7 +37,7 @@ class ValueNet(torch.nn.Module):
 
 class ActorCritic:
     """
-    现在定义ActorCritic算法，主要包含采取动作（take_action()）和更新网络参数（update()）两个函数。
+    ActorCritic算法，主要包含采取动作（take_action()）和更新网络参数（update()）两个函数。
     """
 
     def __init__(self, state_dim, hidden_dim, action_dim,
@@ -60,19 +60,22 @@ class ActorCritic:
         return action.item()
 
     def update(self, transition_dict):
-        states = torch.tensor(np.array(transition_dict['states']), dtype=torch.float).to(self.device)
-        actions = torch.tensor(transition_dict['actions']).view(-1, 1).to(self.device)
-        rewards = torch.tensor(transition_dict['rewards'], dtype=torch.float).view(-1, 1).to(self.device)
-        next_states = torch.tensor(np.array(transition_dict['next_states']), dtype=torch.float).to(self.device)
-        dones = torch.tensor(transition_dict['dones'], dtype=torch.float).view(-1, 1).to(self.device)
+        states = torch.tensor(np.array(transition_dict["states"]), dtype=torch.float).to(self.device)
+        actions = torch.tensor(transition_dict["actions"]).view(-1, 1).to(self.device)
+        rewards = torch.tensor(transition_dict["rewards"], dtype=torch.float).view(-1, 1).to(self.device)
+        next_states = torch.tensor(np.array(transition_dict["next_states"]), dtype=torch.float).to(self.device)
+        dones = torch.tensor(transition_dict["dones"], dtype=torch.float).view(-1, 1).to(self.device)
 
         # 时序差分目标
         td_target = rewards + self.gamma * self.critic(next_states) * (1 - dones)
-        td_delta = td_target - self.critic(states)  # 时序差分误差
+        # 时序差分误差
+        td_error = td_target - self.critic(states)
+
         log_probs = torch.log(self.actor(states).gather(1, actions))
-        actor_loss = torch.mean(-log_probs * td_delta.detach())
+        actor_loss = torch.mean(-log_probs * td_error.detach())
         # 均方误差损失函数
         critic_loss = torch.mean(F.mse_loss(self.critic(states), td_target.detach()))
+        
         self.actor_optimizer.zero_grad()
         self.critic_optimizer.zero_grad()
         actor_loss.backward()  # 计算策略网络的梯度
