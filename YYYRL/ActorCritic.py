@@ -103,9 +103,9 @@ def train(env_name: str):
 
     agent = ActorCritic(state_dim, hidden_dim, action_dim, actor_lr, critic_lr, gamma, device)
 
-    return_list = train_on_policy_agent(env, agent, num_episodes)
-    # 回报的平均值 = 146.496
-    return return_list
+    episode_reward_list = train_on_policy_agent(env, agent, num_episodes)
+    # episode_reward_list 的平均值 = 146.496
+    return episode_reward_list
 
 
 def main():
