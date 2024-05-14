@@ -3,7 +3,7 @@ import gym
 import numpy as np
 # from tqdm import tqdm
 import torch
-import torch.nn.functional as fun
+import torch.nn.functional as F
 from torch.distributions import Normal
 import matplotlib.pyplot as plt
 import HandsOnRL.rl_utils as rl_utils
@@ -18,9 +18,9 @@ class PolicyNetContinuous(torch.nn.Module):
         self.action_bound = action_bound
 
     def forward(self, x):
-        x = fun.relu(self.fc1(x))
+        x = F.relu(self.fc1(x))
         mu = self.fc_mu(x)
-        std = fun.softplus(self.fc_std(x))
+        std = F.softplus(self.fc_std(x))
         dist = Normal(mu, std)
         normal_sample = dist.rsample()  # rsample()是重参数化采样
         log_prob = dist.log_prob(normal_sample)
@@ -40,8 +40,8 @@ class QValueNetContinuous(torch.nn.Module):
 
     def forward(self, x, a):
         cat = torch.cat([x, a], dim=1)
-        x = fun.relu(self.fc1(cat))
-        x = fun.relu(self.fc2(x))
+        x = F.relu(self.fc1(cat))
+        x = F.relu(self.fc2(x))
         return self.fc_out(x)
 
 
@@ -106,8 +106,8 @@ class SACContinuous:
 
         # 更新两个Q网络
         td_target = self.calc_target(rewards, next_states, dones)
-        critic_1_loss = torch.mean(fun.mse_loss(self.critic_1(states, actions), td_target.detach()))
-        critic_2_loss = torch.mean(fun.mse_loss(self.critic_2(states, actions), td_target.detach()))
+        critic_1_loss = torch.mean(F.mse_loss(self.critic_1(states, actions), td_target.detach()))
+        critic_2_loss = torch.mean(F.mse_loss(self.critic_2(states, actions), td_target.detach()))
         self.critic_1_optimizer.zero_grad()
         critic_1_loss.backward()
         self.critic_1_optimizer.step()
@@ -188,8 +188,8 @@ class PolicyNet(torch.nn.Module):
         self.fc2 = torch.nn.Linear(hidden_dim, action_dim)
 
     def forward(self, x):
-        x = fun.relu(self.fc1(x))
-        return fun.softmax(self.fc2(x), dim=1)
+        x = F.relu(self.fc1(x))
+        return F.softmax(self.fc2(x), dim=1)
 
 
 class QValueNet(torch.nn.Module):
@@ -201,7 +201,7 @@ class QValueNet(torch.nn.Module):
         self.fc2 = torch.nn.Linear(hidden_dim, action_dim)
 
     def forward(self, x):
-        x = fun.relu(self.fc1(x))
+        x = F.relu(self.fc1(x))
         return self.fc2(x)
 
 
@@ -271,9 +271,9 @@ class SAC:
         # 更新两个Q网络
         td_target = self.calc_target(rewards, next_states, dones)
         critic_1_q_values = self.critic_1(states).gather(1, actions)
-        critic_1_loss = torch.mean(fun.mse_loss(critic_1_q_values, td_target.detach()))
+        critic_1_loss = torch.mean(F.mse_loss(critic_1_q_values, td_target.detach()))
         critic_2_q_values = self.critic_2(states).gather(1, actions)
-        critic_2_loss = torch.mean(fun.mse_loss(critic_2_q_values, td_target.detach()))
+        critic_2_loss = torch.mean(F.mse_loss(critic_2_q_values, td_target.detach()))
         self.critic_1_optimizer.zero_grad()
         critic_1_loss.backward()
         self.critic_1_optimizer.step()

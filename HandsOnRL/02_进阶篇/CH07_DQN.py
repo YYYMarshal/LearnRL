@@ -3,7 +3,7 @@ import gym
 import numpy as np
 from tqdm import tqdm
 import torch
-import torch.nn.functional as fun
+import torch.nn.functional as F
 import matplotlib.pyplot as plt
 from HandsOnRL.rl_utils import ReplayBuffer, moving_average
 
@@ -23,7 +23,7 @@ class QNet(torch.nn.Module):
         # x = fun.relu(self.fc1(x))  # 隐藏层使用ReLU激活函数
         # return self.fc2(x)
         out = self.fc1(x)
-        out = fun.relu(out)
+        out = F.relu(out)
         out = self.fc2(out)
         return out
 
@@ -70,7 +70,7 @@ class DQN:
         max_next_q_values = self.target_q_net(next_states).max(1)[0].view(-1, 1)
         # TD误差目标
         q_targets = rewards + self.gamma * max_next_q_values * (1 - dones)
-        dqn_loss = torch.mean(fun.mse_loss(q_values, q_targets))  # 均方误差损失函数
+        dqn_loss = torch.mean(F.mse_loss(q_values, q_targets))  # 均方误差损失函数
         self.optimizer.zero_grad()  # PyTorch中默认梯度会累积,这里需要显式将梯度置为0
         dqn_loss.backward()  # 反向传播更新参数
         self.optimizer.step()
@@ -181,10 +181,10 @@ class ConvolutionalQnet(torch.nn.Module):
 
     def forward(self, x):
         x = x / 255
-        x = fun.relu(self.conv1(x))
-        x = fun.relu(self.conv2(x))
-        x = fun.relu(self.conv3(x))
-        x = fun.relu(self.fc4(x))
+        x = F.relu(self.conv1(x))
+        x = F.relu(self.conv2(x))
+        x = F.relu(self.conv3(x))
+        x = F.relu(self.fc4(x))
         return self.head(x)
 
 

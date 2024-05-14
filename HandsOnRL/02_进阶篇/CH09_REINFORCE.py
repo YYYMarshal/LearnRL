@@ -1,6 +1,6 @@
 import gym
 import torch
-import torch.nn.functional as fun
+import torch.nn.functional as F
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
@@ -14,8 +14,8 @@ class PolicyNet(torch.nn.Module):
         self.fc2 = torch.nn.Linear(hidden_dim, action_dim)
 
     def forward(self, x):
-        x = fun.relu(self.fc1(x))
-        return fun.softmax(self.fc2(x), dim=1)
+        x = F.relu(self.fc1(x))
+        return F.softmax(self.fc2(x), dim=1)
 
 
 class REINFORCE:

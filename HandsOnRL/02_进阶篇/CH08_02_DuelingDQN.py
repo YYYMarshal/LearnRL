@@ -2,7 +2,7 @@ import random
 import gym
 import numpy as np
 import torch
-import torch.nn.functional as fun
+import torch.nn.functional as F
 import matplotlib.pyplot as plt
 import HandsOnRL.rl_utils as rl_utils
 from CH08_01_DoubleDQN import Qnet, train_dqn
@@ -20,8 +20,8 @@ class VAnet(torch.nn.Module):
         self.fc_V = torch.nn.Linear(hidden_dim, 1)
 
     def forward(self, x):
-        a = self.fc_A(fun.relu(self.fc1(x)))
-        v = self.fc_V(fun.relu(self.fc1(x)))
+        a = self.fc_A(F.relu(self.fc1(x)))
+        v = self.fc_V(F.relu(self.fc1(x)))
         q = v + a - a.mean(1).view(-1, 1)  # Q值由V值和A值计算得到
         return q
 
@@ -74,7 +74,7 @@ class DQN:
         else:
             max_next_q_values = self.target_q_net(next_states).max(1)[0].view(-1, 1)
         q_targets = rewards + self.gamma * max_next_q_values * (1 - dones)
-        dqn_loss = torch.mean(fun.mse_loss(q_values, q_targets))
+        dqn_loss = torch.mean(F.mse_loss(q_values, q_targets))
         self.optimizer.zero_grad()
         dqn_loss.backward()
         self.optimizer.step()

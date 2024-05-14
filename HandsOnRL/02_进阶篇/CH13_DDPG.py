@@ -4,7 +4,7 @@ import numpy as np
 # from tqdm import tqdm
 import torch
 # from torch import nn
-import torch.nn.functional as fun
+import torch.nn.functional as F
 import matplotlib.pyplot as plt
 import HandsOnRL.rl_utils as rl_utils
 
@@ -17,7 +17,7 @@ class PolicyNet(torch.nn.Module):
         self.action_bound = action_bound  # action_bound是环境可以接受的动作最大值
 
     def forward(self, x):
-        x = fun.relu(self.fc1(x))
+        x = F.relu(self.fc1(x))
         return torch.tanh(self.fc2(x)) * self.action_bound
 
 
@@ -30,8 +30,8 @@ class QValueNet(torch.nn.Module):
 
     def forward(self, x, a):
         cat = torch.cat([x, a], dim=1)  # 拼接状态和动作
-        x = fun.relu(self.fc1(cat))
-        x = fun.relu(self.fc2(x))
+        x = F.relu(self.fc1(cat))
+        x = F.relu(self.fc2(x))
         return self.fc_out(x)
 
 
@@ -74,7 +74,7 @@ class DDPG:
 
         next_q_values = self.target_critic(next_states, self.target_actor(next_states))
         q_targets = rewards + self.gamma * next_q_values * (1 - dones)
-        critic_loss = torch.mean(fun.mse_loss(self.critic(states, actions), q_targets))
+        critic_loss = torch.mean(F.mse_loss(self.critic(states, actions), q_targets))
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
         self.critic_optimizer.step()

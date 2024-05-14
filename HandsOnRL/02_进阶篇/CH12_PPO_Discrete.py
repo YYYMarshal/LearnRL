@@ -1,7 +1,7 @@
 import gym
-import numpy as np
 import torch
 import torch.nn.functional as F
+import numpy as np
 import matplotlib.pyplot as plt
 import HandsOnRL.rl_utils as rl_utils
 
@@ -28,17 +28,21 @@ class ValueNet(torch.nn.Module):
         return self.fc2(x)
 
 
-class ActorCritic:
-    def __init__(self, state_dim, hidden_dim, action_dim, actor_lr, critic_lr, gamma, device):
-        # 策略网络
+class PPO:
+    """
+    PPO算法,采用截断方式
+    """
+
+    def __init__(self, state_dim, hidden_dim, action_dim, actor_lr,
+                 critic_lr, lmbda, epochs, eps, gamma, device):
         self.actor = PolicyNet(state_dim, hidden_dim, action_dim).to(device)
-        # 价值网络
         self.critic = ValueNet(state_dim, hidden_dim).to(device)
-        # 策略网络优化器
         self.actor_optimizer = torch.optim.Adam(self.actor.parameters(), lr=actor_lr)
-        # 价值网络优化器
         self.critic_optimizer = torch.optim.Adam(self.critic.parameters(), lr=critic_lr)
         self.gamma = gamma
+        self.lmbda = lmbda
+        self.epochs = epochs  # 一条序列的数据用来训练轮数
+        self.eps = eps  # PPO中截断范围的参数
         self.device = device
 
     def take_action(self, state):
@@ -49,43 +53,51 @@ class ActorCritic:
         return action.item()
 
     def update(self, transition_dict):
-        states = torch.tensor(np.array(transition_dict['states']), dtype=torch.float).to(self.device)
-        actions = torch.tensor(transition_dict['actions']).view(-1, 1).to(self.device)
-        rewards = torch.tensor(transition_dict['rewards'], dtype=torch.float).view(-1, 1).to(self.device)
-        next_states = torch.tensor(np.array(transition_dict['next_states']), dtype=torch.float).to(self.device)
-        dones = torch.tensor(transition_dict['dones'], dtype=torch.float).view(-1, 1).to(self.device)
+        states = torch.tensor(np.array(transition_dict["states"]), dtype=torch.float).to(self.device)
+        actions = torch.tensor(transition_dict["actions"]).view(-1, 1).to(self.device)
+        rewards = torch.tensor(transition_dict["rewards"], dtype=torch.float).view(-1, 1).to(self.device)
+        next_states = torch.tensor(np.array(transition_dict["next_states"]), dtype=torch.float).to(self.device)
+        dones = torch.tensor(transition_dict["dones"], dtype=torch.float).view(-1, 1).to(self.device)
 
-        # 时序差分目标
         td_target = rewards + self.gamma * self.critic(next_states) * (1 - dones)
-        td_delta = td_target - self.critic(states)  # 时序差分误差
-        log_probs = torch.log(self.actor(states).gather(1, actions))
-        actor_loss = torch.mean(-log_probs * td_delta.detach())
-        # 均方误差损失函数
-        critic_loss = torch.mean(F.mse_loss(self.critic(states), td_target.detach()))
-        self.actor_optimizer.zero_grad()
-        self.critic_optimizer.zero_grad()
-        actor_loss.backward()  # 计算策略网络的梯度
-        critic_loss.backward()  # 计算价值网络的梯度
-        self.actor_optimizer.step()  # 更新策略网络的参数
-        self.critic_optimizer.step()  # 更新价值网络的参数
+        td_error = td_target - self.critic(states)
+        advantage = rl_utils.compute_advantage(self.gamma, self.lmbda, td_error.cpu()).to(self.device)
+        old_log_probs = torch.log(self.actor(states).gather(1, actions)).detach()
+
+        for _ in range(self.epochs):
+            log_probs = torch.log(self.actor(states).gather(1, actions))
+            ratio = torch.exp(log_probs - old_log_probs)
+            surr1 = ratio * advantage
+            surr2 = torch.clamp(ratio, 1 - self.eps, 1 + self.eps) * advantage  # 截断
+            actor_loss = torch.mean(-torch.min(surr1, surr2))  # PPO损失函数
+            critic_loss = torch.mean(F.mse_loss(self.critic(states), td_target.detach()))
+            self.actor_optimizer.zero_grad()
+            self.critic_optimizer.zero_grad()
+            actor_loss.backward()
+            critic_loss.backward()
+            self.actor_optimizer.step()
+            self.critic_optimizer.step()
 
 
 def main():
     actor_lr = 1e-3
     critic_lr = 1e-2
-    num_episodes = 1000
+    num_episodes = 500
     hidden_dim = 128
     gamma = 0.98
+    lmbda = 0.95
+    epochs = 10
+    eps = 0.2
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
-    env_name = "CartPole-v0"
-    # env_name = "Acrobot-v0"
+    env_name = 'CartPole-v0'
     env = gym.make(env_name)
     env.seed(0)
     torch.manual_seed(0)
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.n
-    agent = ActorCritic(state_dim, hidden_dim, action_dim, actor_lr, critic_lr, gamma, device)
+    agent = PPO(state_dim, hidden_dim, action_dim, actor_lr,
+                critic_lr, lmbda, epochs, eps, gamma, device)
 
     return_list = rl_utils.train_on_policy_agent(env, agent, num_episodes)
 
@@ -93,14 +105,14 @@ def main():
     plt.plot(episodes_list, return_list)
     plt.xlabel('Episodes')
     plt.ylabel('Returns')
-    plt.title('Actor-Critic on {}'.format(env_name))
+    plt.title('PPO on {}'.format(env_name))
     plt.show()
 
     mv_return = rl_utils.moving_average(return_list, 9)
     plt.plot(episodes_list, mv_return)
     plt.xlabel('Episodes')
     plt.ylabel('Returns')
-    plt.title('Actor-Critic on {}'.format(env_name))
+    plt.title('PPO on {}'.format(env_name))
     plt.show()
 
 

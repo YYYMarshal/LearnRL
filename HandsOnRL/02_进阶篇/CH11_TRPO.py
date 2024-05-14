@@ -2,7 +2,7 @@ import torch
 import numpy as np
 import gym
 import matplotlib.pyplot as plt
-import torch.nn.functional as fun
+import torch.nn.functional as F
 import HandsOnRL.rl_utils as rl_utils
 import copy
 
@@ -14,8 +14,8 @@ class PolicyNet(torch.nn.Module):
         self.fc2 = torch.nn.Linear(hidden_dim, action_dim)
 
     def forward(self, x):
-        x = fun.relu(self.fc1(x))
-        return fun.softmax(self.fc2(x), dim=1)
+        x = F.relu(self.fc1(x))
+        return F.softmax(self.fc2(x), dim=1)
 
 
 class ValueNet(torch.nn.Module):
@@ -25,7 +25,7 @@ class ValueNet(torch.nn.Module):
         self.fc2 = torch.nn.Linear(hidden_dim, 1)
 
     def forward(self, x):
-        x = fun.relu(self.fc1(x))
+        x = F.relu(self.fc1(x))
         return self.fc2(x)
 
 
@@ -143,7 +143,7 @@ class TRPO:
         advantage = compute_advantage(self.gamma, self.lmbda, td_delta.cpu()).to(self.device)
         old_log_probs = torch.log(self.actor(states).gather(1, actions)).detach()
         old_action_dists = torch.distributions.Categorical(self.actor(states).detach())
-        critic_loss = torch.mean(fun.mse_loss(self.critic(states), td_target.detach()))
+        critic_loss = torch.mean(F.mse_loss(self.critic(states), td_target.detach()))
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
         self.critic_optimizer.step()  # 更新价值函数
@@ -193,9 +193,9 @@ class PolicyNetContinuous(torch.nn.Module):
         self.fc_std = torch.nn.Linear(hidden_dim, action_dim)
 
     def forward(self, x):
-        x = fun.relu(self.fc1(x))
+        x = F.relu(self.fc1(x))
         mu = 2.0 * torch.tanh(self.fc_mu(x))
-        std = fun.softplus(self.fc_std(x))
+        std = F.softplus(self.fc_std(x))
         return mu, std  # 高斯分布的均值和标准差
 
 
@@ -299,7 +299,7 @@ class TRPOContinuous:
         mu, std = self.actor(states)
         old_action_dists = torch.distributions.Normal(mu.detach(), std.detach())
         old_log_probs = old_action_dists.log_prob(actions)
-        critic_loss = torch.mean(fun.mse_loss(self.critic(states), td_target.detach()))
+        critic_loss = torch.mean(F.mse_loss(self.critic(states), td_target.detach()))
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
         self.critic_optimizer.step()
