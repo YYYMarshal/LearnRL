@@ -18,6 +18,22 @@ class PolicyNet(torch.nn.Module):
         return F.softmax(self.fc2(x), dim=1)
 
 
+"""
+class PolicyNet(torch.nn.Module):
+    def __init__(self, state_dim, hidden_dim, action_dim):
+        super(PolicyNet, self).__init__()
+        self.model = torch.nn.Sequential(
+            torch.nn.Linear(state_dim, hidden_dim),
+            torch.nn.ReLU(),
+            torch.nn.Linear(hidden_dim, action_dim),
+            torch.nn.Softmax(dim=1)
+        )
+
+    def forward(self, x):
+        return self.model(x)
+"""
+
+
 class REINFORCE:
     def __init__(self, state_dim, hidden_dim, action_dim, learning_rate, gamma, device):
         self.policy_net = PolicyNet(state_dim, hidden_dim, action_dim).to(device)
