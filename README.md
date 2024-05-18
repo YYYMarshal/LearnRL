@@ -41,6 +41,9 @@ pip install gym[atari]
 pip install swig
 # box2d-py-2.3.8
 pip install gym[box2d]
+
+# 2024-5-15 02:47:41
+pip install tyro
 ```
 
 # XtdPyTorch
@@ -49,7 +52,7 @@ pip install gym[box2d]
 
 
 
-```python
+```cmd
 conda create -n XtdPyTorch python=3.6
 conda activate XtdPyTorch
 # 用这个：CUDA 11.3
