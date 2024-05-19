@@ -151,7 +151,8 @@ def train(env_name: str, dqn_type: str):
 
 def main_single_dqn(dqn_type: str):
     start_time = Timer.get_current_time()
-    env_name = "CartPole-v0"
+    # env_name = "CartPole-v0"
+    env_name = "Acrobot-v1"
     episode_reward_list = train(env_name, dqn_type)
     Timer.time_difference(start_time)
     plot(episode_reward_list, dqn_type, env_name)
@@ -217,7 +218,9 @@ def main_all_dqn():
 
 
 if __name__ == '__main__':
-    # main_single_dqn("DQN") # Reward 的平均值 = 141.316
-    main_single_dqn("DoubleDQN")
+    # CartPole, Reward 的平均值 = 141.316
+    # Acrobot, Episode Reward List 的平均值 = -122.096
+    main_single_dqn("DQN")
+    # main_single_dqn("DoubleDQN")
     # main_single_dqn("DuelingDQN")
     # main_all_dqn()
