@@ -1,14 +1,15 @@
 import numpy as np
 import torch
+from ReplayBuffer import ReplayBuffer
 
 
 def train_on_policy_agent(env, agent, num_episodes,
-                          is_render=False, interval=10):
+                          is_render=False, print_render_count=10):
     # num_episodes 次 Episode 的 Reward 的列表集合
     # 记录所有 Episode 的总奖励
     episode_reward_list = []
-    # 每运行 num_episodes * (1/interval) 次打印一次信息、显示画面（可选）
-    part = num_episodes / interval
+    # 每运行 num_episodes * (1/print_render_count) 次打印一次信息、显示画面（可选）
+    part = num_episodes / print_render_count
     for episode in range(num_episodes):
         # 每一个 Episode 的 总Reward
         episode_reward = 0
@@ -55,10 +56,10 @@ def train_on_policy_agent(env, agent, num_episodes,
 
 
 def train_off_policy_agent(env, agent, num_episodes,
-                           replay_buffer, minimal_size, batch_size,
-                           is_render=False, interval=10):
+                           replay_buffer: ReplayBuffer, minimal_size, batch_size,
+                           is_render=False, print_render_count=10):
     episode_reward_list = []
-    part = num_episodes / interval
+    part = num_episodes / print_render_count
     for episode in range(num_episodes):
         episode_reward = 0
         state = env.reset()
