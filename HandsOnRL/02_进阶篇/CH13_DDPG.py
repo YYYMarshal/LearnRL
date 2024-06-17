@@ -6,7 +6,8 @@ import torch
 # from torch import nn
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
-import HandsOnRL.rl_utils as rl_utils
+# import HandsOnRL.rl_utils as rl_utils
+from HandsOnRL.rl_utils import ReplayBuffer, train_off_policy_agent, moving_average
 
 
 class PolicyNet(torch.nn.Module):
@@ -14,7 +15,8 @@ class PolicyNet(torch.nn.Module):
         super(PolicyNet, self).__init__()
         self.fc1 = torch.nn.Linear(state_dim, hidden_dim)
         self.fc2 = torch.nn.Linear(hidden_dim, action_dim)
-        self.action_bound = action_bound  # action_bound是环境可以接受的动作最大值
+        # action_bound是环境可以接受的动作最大值
+        self.action_bound = action_bound
 
     def forward(self, x):
         x = F.relu(self.fc1(x))
@@ -107,14 +109,14 @@ def main():
     np.random.seed(0)
     env.seed(0)
     torch.manual_seed(0)
-    replay_buffer = rl_utils.ReplayBuffer(buffer_size)
+    replay_buffer = ReplayBuffer(buffer_size)
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.shape[0]
     action_bound = env.action_space.high[0]  # 动作最大值
     agent = DDPG(state_dim, hidden_dim, action_dim, action_bound,
                  sigma, actor_lr, critic_lr, tau, gamma, device)
 
-    return_list = rl_utils.train_off_policy_agent(
+    return_list = train_off_policy_agent(
         env, agent, num_episodes, replay_buffer, minimal_size, batch_size)
 
     episodes_list = list(range(len(return_list)))
@@ -124,7 +126,7 @@ def main():
     plt.title('DDPG on {}'.format(env_name))
     plt.show()
 
-    mv_return = rl_utils.moving_average(return_list, 9)
+    mv_return = moving_average(return_list, 9)
     plt.plot(episodes_list, mv_return)
     plt.xlabel('Episodes')
     plt.ylabel('Returns')
