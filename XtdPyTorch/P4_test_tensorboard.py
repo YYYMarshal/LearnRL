@@ -16,6 +16,7 @@ def fun_01():
     writer = SummaryWriter("logs")
     # img_path = r"hymenoptera_data/train/ants_image/0013035.jpg"
     img_path = r"hymenoptera_data/train/bees_image/16838648_415acd9e3f.jpg"
+    img_path = r"hymenoptera_data/train/bees/16838648_415acd9e3f.jpg"
     img_array = convert_image(img_path)
     writer.add_image("test", img_array, global_step=2, dataformats="HWC")
     for i in range(100):
